@@ -1,0 +1,21 @@
+version: 2
+project_name: alfred-1password-search
+builds:
+  - id: amd64
+    main: ./src
+    binary: alfred-1password-search-amd64
+    goos: [darwin]
+    goarch: [amd64]
+    env: [CGO_ENABLED=0]
+  - id: arm64
+    main: ./src
+    binary: alfred-1password-search-arm64
+    goos: [darwin]
+    goarch: [arm64]
+    env: [CGO_ENABLED=0]
+archives:
+  - format: zip
+    files:
+      - workflow/**
+release:
+  draft: true

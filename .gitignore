@@ -1,0 +1,6 @@
+.DS_Store
+workflow/prefs.plist
+workflow/alfred-1password-search
+workflow/alfred-1password-search-amd64
+workflow/alfred-1password-search-arm64
+*.alfredworkflow

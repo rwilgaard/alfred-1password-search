@@ -1,0 +1,86 @@
+// src/internal/util/util.go
+package util
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	aw "github.com/deanishe/awgo"
+	"github.com/sethvargo/go-password/password"
+)
+
+var (
+	IconBack   = &aw.Icon{Value: "icons/go_back.png"}
+	IconEdit   = &aw.Icon{Value: "icons/edit.png"}
+	IconDelete = &aw.Icon{Value: "icons/trash.png"}
+	IconFolder = &aw.Icon{Value: "icons/vault.png"}
+)
+
+func GetIcon(key string) *aw.Icon {
+	iconPath := fmt.Sprintf("icons/%s.png", strings.ToLower(key))
+	if _, err := os.Stat(iconPath); err == nil {
+		return &aw.Icon{Value: iconPath}
+	}
+	return &aw.Icon{Value: "icons/default.png"}
+}
+
+func GeneratePassword(length int, symbols bool, allowedSymbols string) (string, error) {
+	input := password.GeneratorInput{Symbols: allowedSymbols}
+	sc := 0
+	if symbols {
+		sc = length / 4
+	}
+	gen, err := password.NewGenerator(&input)
+	if err != nil {
+		return "", err
+	}
+	return gen.Generate(length, length/4, sc, false, true)
+}
+
+func IsCacheStale(wf *aw.Workflow, cacheKey string) bool {
+	cachePath := filepath.Join(wf.CacheDir(), cacheKey)
+	cacheInfo, err := os.Stat(cachePath)
+	if err != nil {
+		return true
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return true
+	}
+
+	sqlitePath := filepath.Join(home, "Library/Group Containers/2BUA8C4S2C.com.1password/Library/Application Support/1Password/Data/1password.sqlite")
+	dbInfo, err := os.Stat(sqlitePath)
+	if err != nil {
+		// Fallback to time-based check if SQLite database is not accessible
+		return time.Since(cacheInfo.ModTime()) > 120*time.Minute
+	}
+
+	var lastSyncDbTime int64
+	lastSyncDbTimeKey := "last_sync_db_time.json"
+	if wf.Cache.Exists(lastSyncDbTimeKey) {
+		if err := wf.Cache.LoadJSON(lastSyncDbTimeKey, &lastSyncDbTime); err == nil {
+			return dbInfo.ModTime().UnixNano() > lastSyncDbTime
+		}
+	}
+
+	return dbInfo.ModTime().After(cacheInfo.ModTime())
+}
+
+func SaveLastSyncDbTime(wf *aw.Workflow) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+
+	sqlitePath := filepath.Join(home, "Library/Group Containers/2BUA8C4S2C.com.1password/Library/Application Support/1Password/Data/1password.sqlite")
+	dbInfo, err := os.Stat(sqlitePath)
+	if err != nil {
+		return
+	}
+
+	_ = wf.Cache.StoreJSON("last_sync_db_time.json", dbInfo.ModTime().UnixNano())
+}
