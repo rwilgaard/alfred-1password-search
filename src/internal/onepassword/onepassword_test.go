@@ -85,7 +85,6 @@ func TestListItems(t *testing.T) {
 				VaultID:    "vlt1",
 				VaultName:  "Personal",
 				PrimaryURL: "https://gmail.com",
-				Username:   "user@gmail.com",
 			},
 		},
 		{

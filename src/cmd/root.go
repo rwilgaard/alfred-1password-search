@@ -4,7 +4,6 @@ import (
 	"time"
 
 	aw "github.com/deanishe/awgo"
-	"github.com/deanishe/awgo/update"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/go-alfredutils/alfredutils"
 	"github.com/spf13/cobra"
@@ -75,7 +74,7 @@ func setupService() *onepassword.Service {
 func init() {
 	wf = aw.New(
 		aw.MaxResults(25),
-		update.GitHub(repo),
+		// update.GitHub(repo),
 		aw.SuppressUIDs(true),
 	)
 }

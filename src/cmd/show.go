@@ -74,9 +74,6 @@ var showCmd = &cobra.Command{
 			_ = wf.Cache.StoreJSON(accountIDCacheKey, accountID)
 		}
 
-		opURL := fmt.Sprintf("onepassword://open/i?a=%s&v=%s&i=%s", accountID, item.VaultID, item.ID)
-		deleteMsg := fmt.Sprintf("Are you sure you want to delete this entry?\nName: %s/%s\nID: %s", item.VaultName, item.Title, item.ID)
-
 		wf.NewItem("← Go back").
 			Icon(util.IconBack).
 			Arg("go_back").
@@ -126,13 +123,9 @@ var showCmd = &cobra.Command{
 		wf.NewItem("Open in 1Password").
 			Icon(util.IconEdit).
 			Arg("open").
-			Var("op_url", opURL).
-			Valid(true)
-
-		wf.NewItem("Delete entry").
-			Icon(util.IconDelete).
-			Arg("delete").
-			Var("msg", deleteMsg).
+			Var("account_id", accountID).
+			Var("vault_id", item.VaultID).
+			Var("item_id", item.ID).
 			Valid(true)
 
 		alfredutils.HandleFeedback(wf)

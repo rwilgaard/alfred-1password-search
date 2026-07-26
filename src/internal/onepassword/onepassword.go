@@ -20,7 +20,6 @@ type Item struct {
 	VaultID    string
 	VaultName  string
 	PrimaryURL string
-	Username   string
 }
 
 type ItemDetail struct {
@@ -124,7 +123,6 @@ func (s *Service) ListItems(vaultName string) ([]Item, error) {
 			VaultID:    r.Vault.ID,
 			VaultName:  r.Vault.Name,
 			PrimaryURL: primaryURL(r.URLs),
-			Username:   r.AdditionalInformation,
 		}
 	}
 	return items, nil

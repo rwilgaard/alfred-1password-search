@@ -35,18 +35,6 @@ var (
 				wf.FatalError(err)
 			}
 
-			if util.IsCacheStale(wf, itemsCacheKey) && (len(query) == 0 || strings.Contains("update items sync", strings.ToLower(query))) {
-				wf.NewItem("Update items").
-					Subtitle("1Password vault has changed. Press ⏎ to update.").
-					Icon(util.IconFolder).
-					Match("Update items sync").
-					Var("item_id", "sync").
-					Var("action", "Show Details").
-					Var("list_query", query).
-					Arg("sync").
-					Valid(true)
-			}
-
 			if !wf.Cache.Exists(itemsCacheKey) {
 				wf.Rerun(0.5)
 				wf.NewItem("Fetching 1Password items...").
@@ -65,10 +53,9 @@ var (
 				if vault == "" || item.VaultName == vault || item.VaultID == vault {
 					if !cfg.FuzzySearch && len(query) > 0 {
 						titleMatch := strings.Contains(strings.ToLower(item.Title), strings.ToLower(query))
-						usernameMatch := strings.Contains(strings.ToLower(item.Username), strings.ToLower(query))
 						vaultMatch := strings.Contains(strings.ToLower(item.VaultName), strings.ToLower(query))
 						urlMatch := strings.Contains(strings.ToLower(item.PrimaryURL), strings.ToLower(query))
-						if !titleMatch && !usernameMatch && !vaultMatch && !urlMatch {
+						if !titleMatch && !vaultMatch && !urlMatch {
 							continue
 						}
 					}
@@ -76,23 +63,29 @@ var (
 				}
 			}
 
+			updateAvailable := util.IsCacheStale(wf, itemsCacheKey) && (len(query) == 0 || strings.Contains("update items sync", strings.ToLower(query)))
+
+			if updateAvailable {
+				wf.Configure(aw.SuppressUIDs(true))
+			}
+
 			for _, item := range items {
 				subtitle := item.VaultName
 				if item.Category != "" {
 					subtitle += "  •  " + item.Category
 				}
-				if item.Username != "" {
-					subtitle += "  •  " + item.Username
+
+				if item.PrimaryURL != "" {
+					subtitle += "  •  " + item.PrimaryURL
 				}
 
 				it := wf.NewItem(item.Title).
 					Subtitle(subtitle).
-					Match(fmt.Sprintf("%s %s %s %s %s %s", item.ID, item.Title, item.VaultName, item.Category, item.PrimaryURL, item.Username)).
+					Match(fmt.Sprintf("%s %s %s %s %s", item.ID, item.Title, item.VaultName, item.Category, item.PrimaryURL)).
 					UID(item.ID).
 					Var("item_id", item.ID).
 					Var("item_name", item.Title).
 					Var("item_url", item.PrimaryURL).
-					Var("item_username", item.Username).
 					Var("vault_id", item.VaultID).
 					Var("vault_name", item.VaultName).
 					Var("list_query", query).
@@ -125,6 +118,25 @@ var (
 
 			if cfg.FuzzySearch && len(query) > 0 {
 				wf.Filter(query)
+			}
+
+			if updateAvailable {
+				wf.NewItem("Update items").
+					Subtitle("1Password vault has changed. Press ⏎ to update.").
+					Icon(util.IconFolder).
+					Match("Update items sync").
+					Var("item_id", "sync").
+					Var("action", "Show Details").
+					Var("list_query", query).
+					Arg("sync").
+					Valid(true)
+
+				items := wf.Feedback.Items
+				if len(items) > 1 {
+					item := items[len(items)-1]
+					copy(items[1:], items[:len(items)-1])
+					items[0] = item
+				}
 			}
 
 			alfredutils.HandleFeedback(wf)
