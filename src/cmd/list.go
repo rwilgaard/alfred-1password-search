@@ -114,6 +114,13 @@ var (
 						Arg(cfg.ModifierCtrl).
 						Valid(true)
 				}
+				if cfg.ModifierShift != "" {
+					it.NewModifier(aw.ModShift).
+						Subtitle(cfg.ModifierShift).
+						Var("action", cfg.ModifierShift).
+						Arg(cfg.ModifierShift).
+						Valid(true)
+				}
 			}
 
 			if cfg.FuzzySearch && len(query) > 0 {

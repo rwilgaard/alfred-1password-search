@@ -75,6 +75,18 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
+				<string>688DB883-C404-4885-A332-DFCE236C908D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>D6317975-5E16-429D-8E2C-295E239009E8</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -142,6 +154,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>7A8B9C0D-1E2F-3A4B-5C6D-7E8F9A0B1C2D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>688DB883-C404-4885-A332-DFCE236C908D</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>7A300A13-05DB-4C56-9899-FAB4030C0415</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -309,7 +334,7 @@
 				<key>escaping</key>
 				<integer>0</integer>
 				<key>script</key>
-				<string>export OP_NO_UPDATE=true; op item get "$item_id" --fields label=password --vault "$vault_id" --reveal | tr -d '\n' | pbcopy</string>
+				<string>export OP_NO_UPDATE=true; op item get "$item_id" --fields label=password --vault "$vault_id" --reveal --format json | jq -r '.value' | tr -d '\n' | pbcopy</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -466,6 +491,20 @@
 						<key>matchmode</key>
 						<integer>0</integer>
 						<key>matchstring</key>
+						<string>Copy OTP</string>
+						<key>outputlabel</key>
+						<string>Copy OTP</string>
+						<key>uid</key>
+						<string>D6317975-5E16-429D-8E2C-295E239009E8</string>
+					</dict>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:action}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
 						<string>Open URL</string>
 						<key>outputlabel</key>
 						<string>Open URL</string>
@@ -589,21 +628,44 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>browser</key>
-				<string></string>
-				<key>skipqueryencode</key>
-				<true/>
-				<key>skipvarencode</key>
+				<key>concurrently</key>
 				<false/>
-				<key>spaces</key>
+				<key>escaping</key>
+				<integer>0</integer>
+				<key>script</key>
+				<string>export OP_NO_UPDATE=true; op item get "$item_id" --vault "$vault_id" --otp | tr -d '\n' | pbcopy</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
 				<string></string>
-				<key>url</key>
-				<string>{var:item_url}</string>
+				<key>type</key>
+				<integer>0</integer>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.openurl</string>
+			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
-			<string>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</string>
+			<string>688DB883-C404-4885-A332-DFCE236C908D</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>OTP copied!</string>
+				<key>title</key>
+				<string>1Password Search</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>7A300A13-05DB-4C56-9899-FAB4030C0415</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -786,28 +848,23 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string>export OP_NO_UPDATE=true
-if op user get --me &gt;/dev/null 2&gt;&amp;1; then
-    osascript -e "tell application \"Alfred\" to run trigger \"show_item\" in workflow \"com.rwilgaard.alfred-1password-search\" with argument \"$item_id\""
-fi</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
+				<key>browser</key>
 				<string></string>
-				<key>type</key>
-				<integer>0</integer>
+				<key>skipqueryencode</key>
+				<true/>
+				<key>skipvarencode</key>
+				<false/>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{var:item_url}</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.script</string>
+			<string>alfred.workflow.action.openurl</string>
 			<key>uid</key>
-			<string>UNLOCK-BEFORE-SHOW</string>
+			<string>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -873,6 +930,32 @@ fi</string>
 			<string>9C0D1E2F-3A4B-5C6D-7E8F-9A0B1C2D3E4F</string>
 			<key>version</key>
 			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>export OP_NO_UPDATE=true
+if op user get --me &gt;/dev/null 2&gt;&amp;1; then
+    osascript -e "tell application \"Alfred\" to run trigger \"show_item\" in workflow \"com.rwilgaard.alfred-1password-search\" with argument \"$item_id\""
+fi</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>UNLOCK-BEFORE-SHOW</string>
+			<key>version</key>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -1202,7 +1285,7 @@ fi</string>
 			<key>xpos</key>
 			<real>400</real>
 			<key>ypos</key>
-			<real>170</real>
+			<real>155</real>
 		</dict>
 		<key>2F3A4B5C-6D7E-8F9A-0B1C-2D3E4F5A6B7C</key>
 		<dict>
@@ -1265,6 +1348,13 @@ fi</string>
 			<key>xpos</key>
 			<real>695</real>
 			<key>ypos</key>
+			<real>345</real>
+		</dict>
+		<key>688DB883-C404-4885-A332-DFCE236C908D</key>
+		<dict>
+			<key>xpos</key>
+			<real>695</real>
+			<key>ypos</key>
 			<real>235</real>
 		</dict>
 		<key>6995268F-3A33-4F50-B0A5-E1E9048B1825</key>
@@ -1279,7 +1369,14 @@ fi</string>
 			<key>xpos</key>
 			<real>50</real>
 			<key>ypos</key>
-			<real>480</real>
+			<real>570</real>
+		</dict>
+		<key>7A300A13-05DB-4C56-9899-FAB4030C0415</key>
+		<dict>
+			<key>xpos</key>
+			<real>875</real>
+			<key>ypos</key>
+			<real>235</real>
 		</dict>
 		<key>7A8B9C0D-1E2F-3A4B-5C6D-7E8F9A0B1C2D</key>
 		<dict>
@@ -1293,7 +1390,7 @@ fi</string>
 			<key>xpos</key>
 			<real>695</real>
 			<key>ypos</key>
-			<real>480</real>
+			<real>570</real>
 		</dict>
 		<key>868D5B1C-8143-4515-9097-A8D66D39AC8C</key>
 		<dict>
@@ -1302,7 +1399,7 @@ fi</string>
 			<key>xpos</key>
 			<real>695</real>
 			<key>ypos</key>
-			<real>750</real>
+			<real>840</real>
 		</dict>
 		<key>8B9C0D1E-2F3A-4B5C-6D7E-8F9A0B1C2D3E</key>
 		<dict>
@@ -1316,14 +1413,14 @@ fi</string>
 			<key>xpos</key>
 			<real>50</real>
 			<key>ypos</key>
-			<real>605</real>
+			<real>695</real>
 		</dict>
 		<key>9A0B1C2D-3E4F-5A6B-7C8D-9E0F1A2B3C4D</key>
 		<dict>
 			<key>xpos</key>
 			<real>695</real>
 			<key>ypos</key>
-			<real>605</real>
+			<real>695</real>
 		</dict>
 		<key>9C0D1E2F-3A4B-5C6D-7E8F-9A0B1C2D3E4F</key>
 		<dict>
@@ -1346,7 +1443,7 @@ fi</string>
 			<key>xpos</key>
 			<real>90</real>
 			<key>ypos</key>
-			<real>780</real>
+			<real>870</real>
 		</dict>
 		<key>CF72B865-679D-4D89-899B-DB47159476C3</key>
 		<dict>
@@ -1355,7 +1452,7 @@ fi</string>
 			<key>xpos</key>
 			<real>400</real>
 			<key>ypos</key>
-			<real>750</real>
+			<real>840</real>
 		</dict>
 		<key>D9393CFC-C12A-4E40-A3E6-0055A80BD127</key>
 		<dict>
@@ -1369,7 +1466,7 @@ fi</string>
 			<key>xpos</key>
 			<real>695</real>
 			<key>ypos</key>
-			<real>345</real>
+			<real>455</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
@@ -1411,6 +1508,10 @@ fi</string>
 						<string>Copy Username</string>
 					</array>
 					<array>
+						<string>Copy OTP</string>
+						<string>Copy OTP</string>
+					</array>
+					<array>
 						<string>Open URL</string>
 						<string>Open URL</string>
 					</array>
@@ -1443,6 +1544,10 @@ fi</string>
 					<array>
 						<string>Copy Username</string>
 						<string>Copy Username</string>
+					</array>
+					<array>
+						<string>Copy OTP</string>
+						<string>Copy OTP</string>
 					</array>
 					<array>
 						<string>Open URL</string>
@@ -1479,6 +1584,10 @@ fi</string>
 						<string>Copy Username</string>
 					</array>
 					<array>
+						<string>Copy OTP</string>
+						<string>Copy OTP</string>
+					</array>
+					<array>
 						<string>Open URL</string>
 						<string>Open URL</string>
 					</array>
@@ -1513,6 +1622,10 @@ fi</string>
 						<string>Copy Username</string>
 					</array>
 					<array>
+						<string>Copy OTP</string>
+						<string>Copy OTP</string>
+					</array>
+					<array>
 						<string>Open URL</string>
 						<string>Open URL</string>
 					</array>
@@ -1530,6 +1643,44 @@ fi</string>
 			<string>popupbutton</string>
 			<key>variable</key>
 			<string>modifier_ctrl</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>Copy OTP</string>
+				<key>pairs</key>
+				<array>
+					<array>
+						<string>Copy Password</string>
+						<string>Copy Password</string>
+					</array>
+					<array>
+						<string>Copy Username</string>
+						<string>Copy Username</string>
+					</array>
+					<array>
+						<string>Copy OTP</string>
+						<string>Copy OTP</string>
+					</array>
+					<array>
+						<string>Open URL</string>
+						<string>Open URL</string>
+					</array>
+					<array>
+						<string>Show Details</string>
+						<string>Show Details</string>
+					</array>
+				</array>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>⇧↩</string>
+			<key>type</key>
+			<string>popupbutton</string>
+			<key>variable</key>
+			<string>modifier_shift</string>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -1612,8 +1763,10 @@ fi</string>
 			<string>pw_length</string>
 		</dict>
 	</array>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>version</key>
-	<string>0.1</string>
+	<string>0.2-alpha</string>
 	<key>webaddress</key>
 	<string>https://github.com/rwilgaard/alfred-1password-search</string>
 </dict>

@@ -14,6 +14,7 @@ type workflowConfig struct {
 	ModifierCmd         string `env:"modifier_cmd"`
 	ModifierOpt         string `env:"modifier_opt"`
 	ModifierCtrl        string `env:"modifier_ctrl"`
+	ModifierShift       string `env:"modifier_shift"`
 	AllowedSymbols      string `env:"allowed_symbols"`
 	FuzzySearch         bool   `env:"fuzzy_search"`
 	IntelligentOrdering bool   `env:"intelligent_ordering"`
