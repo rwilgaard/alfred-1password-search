@@ -19,29 +19,9 @@ var showCmd = &cobra.Command{
 		itemID := args[0]
 
 		if itemID == "sync" {
-			svc := setupService()
-			if svc == nil {
-				return nil
-			}
-
-			vaults, err := svc.ListVaults()
-			if err != nil {
+			if err := syncCache(); err != nil {
 				return err
 			}
-			if err := wf.Cache.StoreJSON(vaultsCacheKey, vaults); err != nil {
-				return err
-			}
-
-			items, err := svc.ListItems("")
-			if err != nil {
-				return err
-			}
-			if err := wf.Cache.StoreJSON(itemsCacheKey, items); err != nil {
-				return err
-			}
-
-			// Save the database modification time so we are marked as in-sync
-			util.SaveLastSyncDbTime(wf)
 
 			// Reopen Alfred showing the list of items with the previous query restored
 			_ = wf.Alfred.RunTrigger("list_items", cfg.ListQuery)
