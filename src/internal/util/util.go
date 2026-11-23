@@ -84,3 +84,43 @@ func SaveLastSyncDbTime(wf *aw.Workflow) {
 
 	_ = wf.Cache.StoreJSON("last_sync_db_time.json", dbInfo.ModTime().UnixNano())
 }
+
+// ParseVaults parses a slice of vault strings (which may be comma-separated)
+// into a clean list of trimmed, non-empty vault identifiers.
+func ParseVaults(inputs []string) []string {
+	var result []string
+	for _, input := range inputs {
+		for _, part := range strings.Split(input, ",") {
+			trimmed := strings.TrimSpace(part)
+			if trimmed != "" {
+				result = append(result, trimmed)
+			}
+		}
+	}
+	return result
+}
+
+// MatchesVault checks whether the given item vault name or ID matches any of the target vaults.
+// If targetVaults is empty, it returns true (matches any vault).
+// Comparison is case-insensitive.
+func MatchesVault(vaultName, vaultID string, targetVaults []string) bool {
+	if len(targetVaults) == 0 {
+		return true
+	}
+	for _, v := range targetVaults {
+		if strings.EqualFold(vaultName, v) || strings.EqualFold(vaultID, v) {
+			return true
+		}
+	}
+	return false
+}
+
+func HasAll(input string, words []string) bool {
+	for _, w := range words {
+		if strings.Contains(input, w) {
+			continue
+		}
+		return false
+	}
+	return true
+}

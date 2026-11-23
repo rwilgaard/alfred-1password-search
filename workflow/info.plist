@@ -110,6 +110,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>32A946DC-34C1-43C9-956B-60C68B50F746</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F</key>
 		<array>
 			<dict>
@@ -289,6 +302,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>B8DFA926-D68D-464E-A5C6-92E02A01CA06</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>32A946DC-34C1-43C9-956B-60C68B50F746</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>C2CD2917-AC9F-4FD5-ABED-3679819045D3</key>
 		<array>
 			<dict>
@@ -329,6 +355,27 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>Password copied!</string>
+				<key>title</key>
+				<string>1Password Search</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>BDEB04F8-B091-4FCC-8AF1-633D024E8D1C</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>concurrently</key>
 				<false/>
 				<key>escaping</key>
@@ -352,27 +399,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>lastpathcomponent</key>
-				<false/>
-				<key>onlyshowifquerypopulated</key>
-				<false/>
-				<key>removeextension</key>
-				<false/>
-				<key>text</key>
-				<string>Password copied!</string>
-				<key>title</key>
-				<string>1Password Search</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.notification</string>
-			<key>uid</key>
-			<string>BDEB04F8-B091-4FCC-8AF1-633D024E8D1C</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>externaltriggerid</key>
 				<string>list_items</string>
 				<key>passinputasargument</key>
@@ -386,27 +412,6 @@
 			<string>alfred.workflow.output.callexternaltrigger</string>
 			<key>uid</key>
 			<string>5C6D7E8F-9A0B-1C2D-3E4F-5A6B7C8D9E0F</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>lastpathcomponent</key>
-				<false/>
-				<key>onlyshowifquerypopulated</key>
-				<false/>
-				<key>removeextension</key>
-				<false/>
-				<key>text</key>
-				<string>Username copied!</string>
-				<key>title</key>
-				<string>1Password Search</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.notification</string>
-			<key>uid</key>
-			<string>D9393CFC-C12A-4E40-A3E6-0055A80BD127</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -432,6 +437,27 @@
 			<string>4D5E6F7A-8B9C-0D1E-2F3A-4B5C6D7E8F9A</string>
 			<key>version</key>
 			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>Username copied!</string>
+				<key>title</key>
+				<string>1Password Search</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>D9393CFC-C12A-4E40-A3E6-0055A80BD127</string>
+			<key>version</key>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -537,6 +563,37 @@
 			<string>2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E</string>
 			<key>version</key>
 			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>37</integer>
+				<key>hotmod</key>
+				<integer>1179648</integer>
+				<key>hotstring</key>
+				<string>L</string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>16DEEC88-83FB-45FE-90CA-96DA3F257FCF</string>
+			<key>version</key>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -796,33 +853,23 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>action</key>
-				<integer>0</integer>
-				<key>argument</key>
-				<integer>0</integer>
-				<key>focusedappvariable</key>
-				<false/>
-				<key>focusedappvariablename</key>
+				<key>browser</key>
 				<string></string>
-				<key>hotkey</key>
-				<integer>37</integer>
-				<key>hotmod</key>
-				<integer>1179648</integer>
-				<key>hotstring</key>
-				<string>L</string>
-				<key>leftcursor</key>
+				<key>skipqueryencode</key>
+				<true/>
+				<key>skipvarencode</key>
 				<false/>
-				<key>modsmode</key>
-				<integer>0</integer>
-				<key>relatedAppsMode</key>
-				<integer>0</integer>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{var:item_url}</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.trigger.hotkey</string>
+			<string>alfred.workflow.action.openurl</string>
 			<key>uid</key>
-			<string>16DEEC88-83FB-45FE-90CA-96DA3F257FCF</string>
+			<string>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -842,27 +889,6 @@
 			<string>alfred.workflow.action.openurl</string>
 			<key>uid</key>
 			<string>2F3A4B5C-6D7E-8F9A-0B1C-2D3E4F5A6B7C</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>browser</key>
-				<string></string>
-				<key>skipqueryencode</key>
-				<true/>
-				<key>skipvarencode</key>
-				<false/>
-				<key>spaces</key>
-				<string></string>
-				<key>url</key>
-				<string>{var:item_url}</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.openurl</string>
-			<key>uid</key>
-			<string>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -890,6 +916,72 @@
 			<string>590B9B98-3667-4590-B691-A86B62A7107E</string>
 			<key>version</key>
 			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>launchmode</key>
+				<integer>0</integer>
+				<key>path</key>
+				<string></string>
+				<key>stackview</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.userinterface.alfredui</string>
+			<key>uid</key>
+			<string>CEAADCD1-F574-48F0-9B9D-A0DD48203B19</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>2</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:selected_vaults_keyword}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>2</integer>
+				<key>runningsubtext</key>
+				<string>Searching selected vaults...</string>
+				<key>script</key>
+				<string>./alfred-1password-search list --vaults "${selected_vaults}" "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Search items in selected vaults</string>
+				<key>title</key>
+				<string>Search selected 1Password vaults</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>32A946DC-34C1-43C9-956B-60C68B50F746</string>
+			<key>version</key>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -930,6 +1022,37 @@
 			<string>9C0D1E2F-3A4B-5C6D-7E8F-9A0B1C2D3E4F</string>
 			<key>version</key>
 			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>35</integer>
+				<key>hotmod</key>
+				<integer>1179648</integer>
+				<key>hotstring</key>
+				<string>P</string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>B8DFA926-D68D-464E-A5C6-92E02A01CA06</string>
+			<key>version</key>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -1145,39 +1268,6 @@ fi</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>behaviour</key>
-				<integer>0</integer>
-				<key>fontmode</key>
-				<integer>0</integer>
-				<key>fontsizing</key>
-				<integer>0</integer>
-				<key>footertext</key>
-				<string></string>
-				<key>inputfile</key>
-				<string></string>
-				<key>inputtype</key>
-				<integer>0</integer>
-				<key>loadingtext</key>
-				<string></string>
-				<key>outputmode</key>
-				<integer>0</integer>
-				<key>scriptinput</key>
-				<integer>0</integer>
-				<key>spellchecking</key>
-				<integer>0</integer>
-				<key>stackview</key>
-				<false/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.userinterface.text</string>
-			<key>uid</key>
-			<string>868D5B1C-8143-4515-9097-A8D66D39AC8C</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>alfredfiltersresults</key>
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
@@ -1225,6 +1315,39 @@ fi</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>behaviour</key>
+				<integer>0</integer>
+				<key>fontmode</key>
+				<integer>0</integer>
+				<key>fontsizing</key>
+				<integer>0</integer>
+				<key>footertext</key>
+				<string></string>
+				<key>inputfile</key>
+				<string></string>
+				<key>inputtype</key>
+				<integer>0</integer>
+				<key>loadingtext</key>
+				<string></string>
+				<key>outputmode</key>
+				<integer>0</integer>
+				<key>scriptinput</key>
+				<integer>0</integer>
+				<key>spellchecking</key>
+				<integer>0</integer>
+				<key>stackview</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.userinterface.text</string>
+			<key>uid</key>
+			<string>868D5B1C-8143-4515-9097-A8D66D39AC8C</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>argument</key>
 				<string></string>
 				<key>passthroughargument</key>
@@ -1262,14 +1385,14 @@ fi</string>
 		<key>16DEEC88-83FB-45FE-90CA-96DA3F257FCF</key>
 		<dict>
 			<key>xpos</key>
-			<real>50</real>
+			<real>30</real>
 			<key>ypos</key>
-			<real>335</real>
+			<real>180</real>
 		</dict>
 		<key>1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D</key>
 		<dict>
 			<key>xpos</key>
-			<real>50</real>
+			<real>175</real>
 			<key>ypos</key>
 			<real>180</real>
 		</dict>
@@ -1293,6 +1416,13 @@ fi</string>
 			<real>1580</real>
 			<key>ypos</key>
 			<real>345</real>
+		</dict>
+		<key>32A946DC-34C1-43C9-956B-60C68B50F746</key>
+		<dict>
+			<key>xpos</key>
+			<real>175</real>
+			<key>ypos</key>
+			<real>450</real>
 		</dict>
 		<key>3C4D5E6F-7A8B-9C0D-1E2F-3A4B5C6D7E8F</key>
 		<dict>
@@ -1367,7 +1497,7 @@ fi</string>
 		<key>6D7E8F9A-0B1C-2D3E-4F5A-6B7C8D9E0F1A</key>
 		<dict>
 			<key>xpos</key>
-			<real>50</real>
+			<real>175</real>
 			<key>ypos</key>
 			<real>570</real>
 		</dict>
@@ -1411,7 +1541,7 @@ fi</string>
 		<key>8F9A0B1C-2D3E-4F5A-6B7C-8D9E0F1A2B3C</key>
 		<dict>
 			<key>xpos</key>
-			<real>50</real>
+			<real>175</real>
 			<key>ypos</key>
 			<real>695</real>
 		</dict>
@@ -1429,6 +1559,13 @@ fi</string>
 			<key>ypos</key>
 			<real>450</real>
 		</dict>
+		<key>B8DFA926-D68D-464E-A5C6-92E02A01CA06</key>
+		<dict>
+			<key>xpos</key>
+			<real>30</real>
+			<key>ypos</key>
+			<real>450</real>
+		</dict>
 		<key>BDEB04F8-B091-4FCC-8AF1-633D024E8D1C</key>
 		<dict>
 			<key>xpos</key>
@@ -1441,9 +1578,16 @@ fi</string>
 			<key>colorindex</key>
 			<integer>1</integer>
 			<key>xpos</key>
-			<real>90</real>
+			<real>215</real>
 			<key>ypos</key>
 			<real>870</real>
+		</dict>
+		<key>CEAADCD1-F574-48F0-9B9D-A0DD48203B19</key>
+		<dict>
+			<key>xpos</key>
+			<real>360</real>
+			<key>ypos</key>
+			<real>365</real>
 		</dict>
 		<key>CF72B865-679D-4D89-899B-DB47159476C3</key>
 		<dict>
@@ -1484,13 +1628,34 @@ fi</string>
 				<true/>
 			</dict>
 			<key>description</key>
-			<string>Only search items in this vault. Leave blank to search all vaults.</string>
+			<string>A comma-separated list of vault names to search in when using the selected vaults keyword.</string>
 			<key>label</key>
-			<string>Vault</string>
+			<string>Selected Vaults</string>
 			<key>type</key>
 			<string>textfield</string>
 			<key>variable</key>
-			<string>vault_name</string>
+			<string>selected_vaults</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>ops</string>
+				<key>placeholder</key>
+				<string>ops</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Keyword for searching in selected vaults.</string>
+			<key>label</key>
+			<string>Selected Vaults Keyword</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>selected_vaults_keyword</string>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -1766,7 +1931,7 @@ fi</string>
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>0.2-alpha</string>
+	<string>0.2-alpha1</string>
 	<key>webaddress</key>
 	<string>https://github.com/rwilgaard/alfred-1password-search</string>
 </dict>

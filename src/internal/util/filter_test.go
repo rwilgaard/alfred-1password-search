@@ -1,0 +1,115 @@
+package util_test
+
+import (
+	"testing"
+
+	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
+	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
+)
+
+func TestFilterAndRankItems(t *testing.T) {
+	items := []onepassword.Item{
+		{
+			ID:         "id-github",
+			Title:      "GitHub",
+			PrimaryURL: "https://github.com",
+			VaultName:  "Personal",
+			Category:   "Login",
+		},
+		{
+			ID:         "id-ghe",
+			Title:      "GitHub Enterprise",
+			PrimaryURL: "https://ghe.company.com",
+			VaultName:  "Work",
+			Category:   "Login",
+		},
+		{
+			ID:         "id-resources",
+			Title:      "Developer Resources",
+			PrimaryURL: "https://github.com/resources",
+			VaultName:  "Personal",
+			Category:   "Login",
+		},
+		{
+			ID:         "id-special-aws",
+			Title:      "Some Cloud Service",
+			PrimaryURL: "https://example.com",
+			VaultName:  "Personal",
+			Category:   "Login",
+		},
+		{
+			ID:         "id-aws",
+			Title:      "AWS Management Console",
+			PrimaryURL: "https://aws.amazon.com",
+			VaultName:  "Work",
+			Category:   "Login",
+		},
+	}
+
+	t.Run("title match ranks above url match", func(t *testing.T) {
+		res := util.FilterAndRankItems(items, "github", true)
+		if len(res) < 3 {
+			t.Fatalf("expected at least 3 matches, got %d", len(res))
+		}
+		// "GitHub" should be #1 because of exact title match
+		if res[0].Title != "GitHub" {
+			t.Errorf("expected res[0] to be 'GitHub', got %q", res[0].Title)
+		}
+		// "GitHub Enterprise" should rank above "Developer Resources" (which only has github in URL)
+		if res[1].Title != "GitHub Enterprise" {
+			t.Errorf("expected res[1] to be 'GitHub Enterprise', got %q", res[1].Title)
+		}
+		if res[2].Title != "Developer Resources" {
+			t.Errorf("expected res[2] to be 'Developer Resources', got %q", res[2].Title)
+		}
+	})
+
+	t.Run("id match ranks above url-only match", func(t *testing.T) {
+		res := util.FilterAndRankItems(items, "id-special-aws", true)
+		if len(res) == 0 {
+			t.Fatal("expected match, got 0")
+		}
+		if res[0].Title != "Some Cloud Service" {
+			t.Errorf("expected 'Some Cloud Service', got %q", res[0].Title)
+		}
+	})
+
+	t.Run("multi-word query across title and vault", func(t *testing.T) {
+		res := util.FilterAndRankItems(items, "github work", true)
+		if len(res) != 1 {
+			t.Fatalf("expected exactly 1 match ('GitHub Enterprise' in Work vault), got %d", len(res))
+		}
+		if res[0].Title != "GitHub Enterprise" {
+			t.Errorf("expected 'GitHub Enterprise', got %q", res[0].Title)
+		}
+	})
+
+	t.Run("empty query returns all items in original order", func(t *testing.T) {
+		res := util.FilterAndRankItems(items, "", true)
+		if len(res) != len(items) {
+			t.Fatalf("expected %d items, got %d", len(items), len(res))
+		}
+	})
+
+	t.Run("non-matching query returns empty", func(t *testing.T) {
+		res := util.FilterAndRankItems(items, "nonexistent-query-xyz", true)
+		if len(res) != 0 {
+			t.Fatalf("expected 0 items, got %d", len(res))
+		}
+	})
+
+	t.Run("non-fuzzy search matches substrings with field ranking", func(t *testing.T) {
+		res := util.FilterAndRankItems(items, "aws", false)
+		if len(res) < 2 {
+			t.Fatalf("expected at least 2 matches for 'aws', got %d", len(res))
+		}
+		// "AWS Management Console" has 'aws' in title -> ranks first
+		if res[0].Title != "AWS Management Console" {
+			t.Errorf("expected res[0] to be 'AWS Management Console', got %q", res[0].Title)
+		}
+		// "Some Cloud Service" has 'aws' in ID -> ranks second
+		if res[1].Title != "Some Cloud Service" {
+			t.Errorf("expected res[1] to be 'Some Cloud Service', got %q", res[1].Title)
+		}
+	})
+}

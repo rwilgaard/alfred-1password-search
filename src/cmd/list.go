@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"strings"
 
 	aw "github.com/deanishe/awgo"
@@ -12,22 +11,35 @@ import (
 )
 
 var (
-	vaultFlag string
+	vaultFlag  string
+	vaultsFlag []string
 
 	listCmd = &cobra.Command{
 		Use:          "list",
 		Short:        "list vault items",
 		SilenceUsage: true,
 		Args:         cobra.RangeArgs(0, 1),
-		Run: func(_ *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, args []string) {
 			var query string
 			if len(args) > 0 {
 				query = args[0]
 			}
 
-			vault := cfg.VaultName
-			if vaultFlag != "" {
-				vault = vaultFlag
+			var targetVaults []string
+			if cmd.Flags().Changed("vaults") {
+				targetVaults = util.ParseVaults(vaultsFlag)
+				if len(targetVaults) == 0 {
+					wf.NewItem("No vaults configured").
+						Subtitle("Please configure Selected Vaults in workflow configuration").
+						Icon(util.IconFolder).
+						Valid(false)
+					alfredutils.HandleFeedback(wf)
+					return
+				}
+			} else if vaultFlag != "" {
+				targetVaults = util.ParseVaults([]string{vaultFlag})
+			} else if cfg.VaultName != "" {
+				targetVaults = util.ParseVaults([]string{cfg.VaultName})
 			}
 
 			var rawItems []onepassword.Item
@@ -48,20 +60,14 @@ var (
 				return
 			}
 
-			var items []onepassword.Item
+			var vaultFiltered []onepassword.Item
 			for _, item := range rawItems {
-				if vault == "" || item.VaultName == vault || item.VaultID == vault {
-					if !cfg.FuzzySearch && len(query) > 0 {
-						titleMatch := strings.Contains(strings.ToLower(item.Title), strings.ToLower(query))
-						vaultMatch := strings.Contains(strings.ToLower(item.VaultName), strings.ToLower(query))
-						urlMatch := strings.Contains(strings.ToLower(item.PrimaryURL), strings.ToLower(query))
-						if !titleMatch && !vaultMatch && !urlMatch {
-							continue
-						}
-					}
-					items = append(items, item)
+				if util.MatchesVault(item.VaultName, item.VaultID, targetVaults) {
+					vaultFiltered = append(vaultFiltered, item)
 				}
 			}
+
+			items := util.FilterAndRankItems(vaultFiltered, query, cfg.FuzzySearch)
 
 			updateAvailable := util.IsCacheStale(wf, itemsCacheKey) && (len(query) == 0 || strings.Contains("update items sync", strings.ToLower(query)))
 
@@ -81,7 +87,6 @@ var (
 
 				it := wf.NewItem(item.Title).
 					Subtitle(subtitle).
-					Match(fmt.Sprintf("%s %s %s %s %s", item.ID, item.Title, item.VaultName, item.Category, item.PrimaryURL)).
 					UID(item.ID).
 					Var("item_id", item.ID).
 					Var("item_name", item.Title).
@@ -123,10 +128,6 @@ var (
 				}
 			}
 
-			if cfg.FuzzySearch && len(query) > 0 {
-				wf.Filter(query)
-			}
-
 			if updateAvailable {
 				wf.NewItem("Update items").
 					Subtitle("1Password vault has changed. Press ⏎ to update.").
@@ -153,5 +154,6 @@ var (
 
 func init() {
 	listCmd.Flags().StringVarP(&vaultFlag, "vault", "v", "", "filter by vault name (overrides vault_name env var)")
+	listCmd.Flags().StringSliceVarP(&vaultsFlag, "vaults", "V", []string{}, "filter by vault names (comma-separated or multiple)")
 	rootCmd.AddCommand(listCmd)
 }

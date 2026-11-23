@@ -4,22 +4,26 @@ import (
 	"time"
 
 	aw "github.com/deanishe/awgo"
+	"github.com/deanishe/awgo/update"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/go-alfredutils/alfredutils"
 	"github.com/spf13/cobra"
+	"go.deanishe.net/fuzzy"
 )
 
 type workflowConfig struct {
-	ModifierReturn      string `env:"modifier_return"`
-	ModifierCmd         string `env:"modifier_cmd"`
-	ModifierOpt         string `env:"modifier_opt"`
-	ModifierCtrl        string `env:"modifier_ctrl"`
-	ModifierShift       string `env:"modifier_shift"`
-	AllowedSymbols      string `env:"allowed_symbols"`
-	FuzzySearch         bool   `env:"fuzzy_search"`
-	IntelligentOrdering bool   `env:"intelligent_ordering"`
-	VaultName           string `env:"vault_name"`
-	ListQuery           string `env:"list_query"`
+	ModifierReturn        string `env:"modifier_return"`
+	ModifierCmd           string `env:"modifier_cmd"`
+	ModifierOpt           string `env:"modifier_opt"`
+	ModifierCtrl          string `env:"modifier_ctrl"`
+	ModifierShift         string `env:"modifier_shift"`
+	AllowedSymbols        string `env:"allowed_symbols"`
+	FuzzySearch           bool   `env:"fuzzy_search"`
+	IntelligentOrdering   bool   `env:"intelligent_ordering"`
+	VaultName             string `env:"vault_name"`
+	SelectedVaults        string `env:"selected_vaults"`
+	SelectedVaultsKeyword string `env:"selected_vaults_keyword"`
+	ListQuery             string `env:"list_query"`
 }
 
 const repo = "rwilgaard/alfred-1password-search"
@@ -73,9 +77,16 @@ func setupService() *onepassword.Service {
 }
 
 func init() {
+	sopts := []fuzzy.Option{
+		fuzzy.AdjacencyBonus(10.0),
+		fuzzy.LeadingLetterPenalty(-0.1),
+		fuzzy.MaxLeadingLetterPenalty(-3.0),
+		fuzzy.UnmatchedLetterPenalty(-0.5),
+	}
 	wf = aw.New(
+		aw.SortOptions(sopts...),
 		aw.MaxResults(25),
-		// update.GitHub(repo),
+		update.GitHub(repo),
 		aw.SuppressUIDs(true),
 	)
 }
