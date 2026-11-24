@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/rwilgaard/alfred-1password-search/src/internal/clipboard"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
-	"github.com/rwilgaard/alfred-1password-search/src/internal/totp"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred/clipboard"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred/totp"
 	"github.com/spf13/cobra"
 )
 
@@ -55,11 +56,18 @@ func copyField(itemID, key string) (string, error) {
 	return copySecret(value, f.Label)
 }
 
+// copySecret copies value out of clipboard history's reach, clears it after
+// clipboard_timeout seconds, and returns a message for the user.
 func copySecret(value, label string) (string, error) {
-	if err := clipboard.Copy(value); err != nil {
+	timeout := time.Duration(cfg.ClipboardTimeout) * time.Second
+	if err := clipboard.CopySecret(wf, value, timeout); err != nil {
 		return "", err
 	}
-	return "Copied " + label, nil
+	msg := "Copied " + label
+	if timeout > 0 {
+		msg += fmt.Sprintf(" — clears in %ds", cfg.ClipboardTimeout)
+	}
+	return msg, nil
 }
 
 // reportError shows err through the workflow's "error" trigger and returns

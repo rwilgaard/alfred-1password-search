@@ -1632,6 +1632,46 @@
 			<key>config</key>
 			<dict>
 				<key>default</key>
+				<string>30</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Seconds before a copied value is cleared from the clipboard (if unchanged). 0 disables.</string>
+			<key>label</key>
+			<string>Clear clipboard after</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>clipboard_timeout</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<true/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string>Check for updates</string>
+			</dict>
+			<key>description</key>
+			<string>Check GitHub for a new version once a day</string>
+			<key>label</key>
+			<string>Updates</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>check_for_updates</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
 				<string>!@#$%^&amp;*</string>
 				<key>placeholder</key>
 				<string></string>

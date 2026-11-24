@@ -18,6 +18,7 @@ type workflowConfig struct {
 	ModifierShift         string `env:"modifier_shift"`
 	AllowedSymbols        string `env:"allowed_symbols"`
 	FuzzySearch           bool   `env:"fuzzy_search"`
+	ClipboardTimeout      int    `env:"clipboard_timeout"` // seconds; 0 never clears
 	VaultName             string `env:"vault_name"`
 	SelectedVaults        string `env:"selected_vaults"`
 	SelectedVaultsKeyword string `env:"selected_vaults_keyword"`
@@ -49,6 +50,7 @@ func Execute() {
 	var err error
 	wf, err = alfred.New(
 		alfred.WithMaxResults(25),
+		alfred.WithUsage(),
 		alfred.WithFuzzy(
 			fuzzy.AdjacencyBonus(10.0),
 			fuzzy.LeadingLetterPenalty(-0.1),
