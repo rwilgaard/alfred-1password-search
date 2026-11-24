@@ -13,10 +13,7 @@ const usageDataKey = "usage.json"
 
 func loadUsage() usage.Store {
 	s := usage.Store{}
-	if !wf.Data.Exists(usageDataKey) {
-		return s
-	}
-	if err := wf.Data.LoadJSON(usageDataKey, &s); err != nil {
+	if err := wf.Data.LoadJSONIfExists(usageDataKey, &s); err != nil {
 		log.Printf("load usage: %v", err)
 		return usage.Store{}
 	}

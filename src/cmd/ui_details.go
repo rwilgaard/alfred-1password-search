@@ -7,10 +7,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/rwilgaard/alfred-1password-search/src/internal/alfredui"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/totp"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
+	alfredui "github.com/rwilgaard/go-alfredutils/v2/alfred/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -111,7 +111,7 @@ func uiDetails(itemID string) alfredui.Actions {
 	// which closed Alfred and this window, so open the window again. The
 	// reopened window never does this, so it can't loop.
 	if time.Since(start) > unlockPromptThreshold && os.Getenv(envReopened) == "" {
-		if err := wf.Alfred.RunTrigger(showDetailsTrigger, itemID); err != nil {
+		if err := wf.RunTrigger(showDetailsTrigger, itemID); err != nil {
 			log.Printf("[ui] reopen details: %v", err)
 		} else {
 			return alfredui.Actions{}
@@ -231,10 +231,8 @@ func notesSheet(notes string) *alfredui.Sheet {
 
 func cachedAccountID(svc *onepassword.Service) (string, error) {
 	var id string
-	if wf.Cache.Exists(accountIDCacheKey) {
-		if err := wf.Cache.LoadJSON(accountIDCacheKey, &id); err == nil && id != "" {
-			return id, nil
-		}
+	if err := wf.Cache.LoadJSONIfExists(accountIDCacheKey, &id); err == nil && id != "" {
+		return id, nil
 	}
 	id, err := svc.GetAccountID()
 	if err != nil {

@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
-	aw "github.com/deanishe/awgo"
-	"github.com/deanishe/awgo/update"
-	"github.com/rwilgaard/go-alfredutils/alfredutils"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred/update"
 	"github.com/spf13/cobra"
 	"go.deanishe.net/fuzzy"
 )
@@ -33,8 +33,9 @@ const (
 )
 
 var (
-	wf  *aw.Workflow
-	cfg = &workflowConfig{}
+	wf      *alfred.Workflow
+	updater *update.Updater
+	cfg     = &workflowConfig{}
 
 	rootCmd = &cobra.Command{
 		Use:           "alfred-1password-search",
@@ -45,35 +46,32 @@ var (
 )
 
 func Execute() {
+	var err error
+	wf, err = alfred.New(
+		alfred.WithMaxResults(25),
+		alfred.WithFuzzy(
+			fuzzy.AdjacencyBonus(10.0),
+			fuzzy.LeadingLetterPenalty(-0.1),
+			fuzzy.MaxLeadingLetterPenalty(-3.0),
+			fuzzy.UnmatchedLetterPenalty(-0.5),
+		),
+	)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	updater = update.GitHub(wf, repo)
 	wf.Run(run)
 }
 
 func run() {
-	if err := alfredutils.InitWorkflow(wf, cfg); err != nil {
+	if err := wf.Config(cfg); err != nil {
 		wf.FatalError(err)
 	}
-	if err := alfredutils.CheckForUpdates(wf); err != nil {
+	if err := updater.Run(); err != nil {
 		wf.FatalError(err)
 	}
 	if err := rootCmd.Execute(); err != nil {
 		wf.FatalError(err)
 	}
-}
-
-func init() {
-	sopts := []fuzzy.Option{
-		fuzzy.AdjacencyBonus(10.0),
-		fuzzy.LeadingLetterPenalty(-0.1),
-		fuzzy.MaxLeadingLetterPenalty(-3.0),
-		fuzzy.UnmatchedLetterPenalty(-0.5),
-	}
-	opts := []aw.Option{
-		aw.SortOptions(sopts...),
-		aw.MaxResults(25),
-	}
-	// Alfred UI scripts get no alfred_workflow_version, and the updater panics without it.
-	if os.Getenv("alfred_workflow_version") != "" {
-		opts = append(opts, update.GitHub(repo))
-	}
-	wf = aw.New(opts...)
 }

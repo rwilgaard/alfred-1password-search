@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
-	"github.com/rwilgaard/go-alfredutils/alfredutils"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +40,7 @@ var (
 				Arg("copy").
 				Valid(true)
 
-			alfredutils.HandleFeedback(wf)
+			wf.Send()
 		},
 	}
 )

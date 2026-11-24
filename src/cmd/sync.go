@@ -1,16 +1,13 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"os"
-	"os/exec"
 	"time"
 
-	aw "github.com/deanishe/awgo"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred"
 	"github.com/spf13/cobra"
 )
 
@@ -65,8 +62,8 @@ func syncAndReopen(svc *onepassword.Service) error {
 	if err := wf.Cache.Store(syncingKey, []byte{}); err != nil {
 		return reportError(err)
 	}
-	defer func() { _ = wf.Cache.Store(syncingKey, nil) }() // nil deletes the marker
-	if err := wf.Alfred.RunTrigger("list_items", cfg.ListQuery); err != nil {
+	defer func() { _ = wf.Cache.Delete(syncingKey) }()
+	if err := wf.RunTrigger("list_items", cfg.ListQuery); err != nil {
 		log.Printf("reopen list: %v", err)
 	}
 	if err := syncCache(svc); err != nil {
@@ -83,35 +80,22 @@ func syncCache(svc *onepassword.Service) error {
 	if err := wf.Cache.StoreJSON(itemsCacheKey, items); err != nil {
 		return fmt.Errorf("could not write item cache: %w", err)
 	}
-	util.SaveLastSyncDbTime(wf)
-	return wf.Cache.Store(syncLockedKey, nil) // nil deletes the marker
-}
-
-// startJob runs this binary detached. A job already running counts as started.
-func startJob(name string, args ...string) error {
-	exe, err := os.Executable()
-	if err != nil {
-		return err
-	}
-	err = wf.RunInBackground(name, exec.Command(exe, args...))
-	if errors.Is(err, aw.ErrJobExists{}) {
-		return nil
-	}
-	return err
+	util.SaveLastSyncDbTime(wf.Cache)
+	return wf.Cache.Delete(syncLockedKey)
 }
 
 // cachedItems returns false after sending a placeholder when there is no
 // cache yet. The caller must then return.
 func cachedItems() ([]onepassword.Item, bool) {
 	if !wf.Cache.Exists(itemsCacheKey) {
-		if err := startJob(syncJobName, "sync"); err != nil {
+		if _, err := wf.Start(syncJobName, "sync"); err != nil {
 			wf.FatalError(err)
 		}
-		wf.Rerun(0.5)
+		wf.Rerun(500 * time.Millisecond)
 		wf.NewItem("Fetching 1Password items...").
 			Subtitle("Please wait a moment").
-			Icon(aw.IconInfo)
-		wf.SendFeedback()
+			Icon(alfred.IconInfo)
+		wf.Send()
 		return nil, false
 	}
 	var items []onepassword.Item
@@ -134,13 +118,13 @@ func checkSync() syncState {
 	if wf.IsRunning(syncJobName) || !wf.Cache.Expired(syncingKey, syncingMaxAge) {
 		return syncRunning
 	}
-	if !util.IsCacheStale(wf, itemsCacheKey) || !wf.Cache.Expired(itemsCacheKey, minSyncInterval) {
+	if !util.IsCacheStale(wf.Cache, itemsCacheKey) || !wf.Cache.Expired(itemsCacheKey, minSyncInterval) {
 		return syncFresh
 	}
 	if !wf.Cache.Expired(syncLockedKey, lockedRetry) {
 		return syncLocked
 	}
-	if err := startJob(syncJobName, "sync", "--auto"); err != nil {
+	if _, err := wf.Start(syncJobName, "sync", "--auto"); err != nil {
 		log.Printf("start sync: %v", err)
 		return syncFresh
 	}

@@ -3,10 +3,9 @@ package cmd
 import (
 	"time"
 
-	aw "github.com/deanishe/awgo"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/usage"
-	"github.com/rwilgaard/go-alfredutils/alfredutils"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +23,7 @@ var recentCmd = &cobra.Command{
 	Use:   "recent",
 	Short: "open the most recently used item",
 	RunE: func(_ *cobra.Command, _ []string) error {
-		av := aw.NewArgVars()
+		av := alfred.NewArgVars()
 		id, ok := recentID(loadUsage())
 		if !ok {
 			return av.Arg("No recently used 1Password item").Var("action", "none").Send()
@@ -36,7 +35,7 @@ var recentCmd = &cobra.Command{
 // cachedTitle looks up an item's title so the details window can show it before loading.
 func cachedTitle(id string) string {
 	var items []onepassword.Item
-	if err := alfredutils.LoadCache(wf, itemsCacheKey, &items); err == nil {
+	if err := wf.Cache.LoadJSONIfExists(itemsCacheKey, &items); err == nil {
 		for _, it := range items {
 			if it.ID == id {
 				return it.Title

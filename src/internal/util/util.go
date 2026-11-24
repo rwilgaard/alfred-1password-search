@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	aw "github.com/deanishe/awgo"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred"
 	"github.com/sethvargo/go-password/password"
 )
 
 var (
-	IconFolder = &aw.Icon{Value: "icons/vault.png"}
-	IconUpdate = &aw.Icon{Value: "icons/update.png"}
+	IconFolder = alfred.Icon{Path: "icons/vault.png"}
+	IconUpdate = alfred.Icon{Path: "icons/update.png"}
 )
 
 func GeneratePassword(length int, symbols bool, allowedSymbols string) (string, error) {
@@ -44,25 +44,25 @@ func dbModTime() (time.Time, error) {
 
 // IsCacheStale compares the 1Password app's database mtime with the last
 // sync. Without access to the database it falls back to a 2 hour age.
-func IsCacheStale(wf *aw.Workflow, cacheKey string) bool {
-	cacheInfo, err := os.Stat(filepath.Join(wf.CacheDir(), cacheKey))
+func IsCacheStale(cache *alfred.Store, cacheKey string) bool {
+	age, err := cache.Age(cacheKey)
 	if err != nil {
 		return true
 	}
 	dbTime, err := dbModTime()
 	if err != nil {
-		return time.Since(cacheInfo.ModTime()) > 120*time.Minute
+		return age > 120*time.Minute
 	}
 	var lastSync int64
-	if err := wf.Cache.LoadJSON(lastSyncDBTimeKey, &lastSync); err == nil {
+	if err := cache.LoadJSON(lastSyncDBTimeKey, &lastSync); err == nil {
 		return dbTime.UnixNano() > lastSync
 	}
-	return dbTime.After(cacheInfo.ModTime())
+	return time.Since(dbTime) < age
 }
 
-func SaveLastSyncDbTime(wf *aw.Workflow) {
+func SaveLastSyncDbTime(cache *alfred.Store) {
 	if t, err := dbModTime(); err == nil {
-		_ = wf.Cache.StoreJSON(lastSyncDBTimeKey, t.UnixNano()) // best effort: staleness falls back to the cache mtime
+		_ = cache.StoreJSON(lastSyncDBTimeKey, t.UnixNano()) // best effort: staleness falls back to the cache mtime
 	}
 }
 
