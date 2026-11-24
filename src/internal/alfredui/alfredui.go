@@ -5,7 +5,6 @@ package alfredui
 
 import (
 	"encoding/json"
-	"io"
 	"os"
 )
 
@@ -52,10 +51,7 @@ type Actions struct {
 }
 
 // Emit writes actions as JSON to stdout.
-func Emit(a Actions) error { return Write(os.Stdout, a) }
-
-// Write writes actions as JSON to w.
-func Write(w io.Writer, a Actions) error { return json.NewEncoder(w).Encode(a) }
+func Emit(a Actions) error { return json.NewEncoder(os.Stdout).Encode(a) }
 
 // NewUpdate returns an empty update action.
 func NewUpdate() Actions { return Actions{Update: &Update{IDs: map[string]Props{}}} }

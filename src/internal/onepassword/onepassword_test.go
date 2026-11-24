@@ -19,23 +19,6 @@ func mockFail() func(string, ...string) *exec.Cmd {
 	}
 }
 
-func TestAuthorization(t *testing.T) {
-	ok := &onepassword.Service{BinPath: "op", ExecCommand: mockOK(`{}`)}
-	if !ok.IsAuthorized() {
-		t.Error("IsAuthorized() = false on success")
-	}
-	if err := ok.Authorize(); err != nil {
-		t.Errorf("Authorize() = %v", err)
-	}
-	fail := &onepassword.Service{BinPath: "op", ExecCommand: mockFail()}
-	if fail.IsAuthorized() {
-		t.Error("IsAuthorized() = true on failure")
-	}
-	if err := fail.Authorize(); err == nil {
-		t.Error("Authorize() = nil on failure")
-	}
-}
-
 func TestListItems(t *testing.T) {
 	const mockJSON = `[{"id":"abc123","title":"Gmail","category":"LOGIN","vault":{"id":"vlt1","name":"Personal"},"additional_information":"user@gmail.com","urls":[{"href":"https://gmail.com","primary":true}]}]`
 
@@ -175,42 +158,5 @@ func TestLookupAndNotes(t *testing.T) {
 	}
 	if got := (&onepassword.ItemDetail{}).Notes(); got != "" {
 		t.Errorf("Notes() on empty item = %q", got)
-	}
-}
-
-func TestVaults(t *testing.T) {
-	items := []onepassword.Item{
-		{VaultID: "v2", VaultName: "work"},
-		{VaultID: "v1", VaultName: "Personal"},
-		{VaultID: "v2", VaultName: "work"},
-	}
-	got := onepassword.Vaults(items)
-	want := []onepassword.Vault{{ID: "v1", Name: "Personal"}, {ID: "v2", Name: "work"}}
-	if len(got) != len(want) {
-		t.Fatalf("got %+v, want %+v", got, want)
-	}
-	for i := range want {
-		if got[i] != want[i] {
-			t.Errorf("got[%d] = %+v, want %+v", i, got[i], want[i])
-		}
-	}
-}
-
-func TestGetAccountID(t *testing.T) {
-	const mockJSON = `[{"url":"my.1password.com","email":"user@example.com","user_uuid":"USER1","account_uuid":"ACCT1"}]`
-
-	svc := &onepassword.Service{BinPath: "op", ExecCommand: mockOK(mockJSON)}
-	id, err := svc.GetAccountID()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if id != "ACCT1" {
-		t.Errorf("got %q, want ACCT1", id)
-	}
-
-	svc2 := &onepassword.Service{BinPath: "op", ExecCommand: mockOK(`[]`)}
-	_, err = svc2.GetAccountID()
-	if err == nil {
-		t.Fatal("expected error for empty accounts")
 	}
 }

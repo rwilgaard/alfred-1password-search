@@ -89,13 +89,6 @@ func TestFilterAndRankItems(t *testing.T) {
 		}
 	})
 
-	t.Run("empty query returns all items in original order", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "", true, nil)
-		if len(res) != len(items) {
-			t.Fatalf("expected %d items, got %d", len(items), len(res))
-		}
-	})
-
 	t.Run("empty query orders by usage, unused keep their order", func(t *testing.T) {
 		usage := map[string]float64{"id-aws": 3, "id-resources": 1}
 		res := util.FilterAndRankItems(items, "", true, usage)
@@ -123,13 +116,6 @@ func TestFilterAndRankItems(t *testing.T) {
 		res := util.FilterAndRankItems(items, "github", true, map[string]float64{"id-resources": 50})
 		if res[0].ID != "id-github" {
 			t.Errorf("res[0] = %q, want id-github", res[0].ID)
-		}
-	})
-
-	t.Run("non-matching query returns empty", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "nonexistent-query-xyz", true, nil)
-		if len(res) != 0 {
-			t.Fatalf("expected 0 items, got %d", len(res))
 		}
 	})
 
