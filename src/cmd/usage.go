@@ -2,29 +2,14 @@ package cmd
 
 import (
 	"log"
-	"time"
 
-	"github.com/rwilgaard/alfred-1password-search/src/internal/usage"
 	"github.com/spf13/cobra"
 )
 
-// usageDataKey is stored in the data dir, not the cache, so clearing the cache keeps the learned ranking.
-const usageDataKey = "usage.json"
-
-func loadUsage() usage.Store {
-	s := usage.Store{}
-	if err := wf.Data.LoadJSONIfExists(usageDataKey, &s); err != nil {
-		log.Printf("load usage: %v", err)
-		return usage.Store{}
-	}
-	return s
-}
-
+// recordUse counts a use of an item for ranking and the recent row.
 func recordUse(id string) {
-	s := loadUsage()
-	s.Record(id, time.Now())
-	if err := wf.Data.StoreJSON(usageDataKey, s); err != nil {
-		log.Printf("store usage: %v", err)
+	if err := wf.Usage.Record(id); err != nil {
+		log.Printf("record usage: %v", err)
 	}
 }
 

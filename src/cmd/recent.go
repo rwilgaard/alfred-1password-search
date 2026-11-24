@@ -4,18 +4,12 @@ import (
 	"time"
 
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
-	"github.com/rwilgaard/alfred-1password-search/src/internal/usage"
 	"github.com/rwilgaard/go-alfredutils/v2/alfred"
 	"github.com/spf13/cobra"
 )
 
 // recentTTL is how long the last used item stays pinned and reachable by the hotkey.
 const recentTTL = 5 * time.Minute
-
-func recentID(s usage.Store) (string, bool) {
-	id, usedAt, ok := s.Latest()
-	return id, ok && time.Since(usedAt) < recentTTL
-}
 
 // recentCmd backs the recent hotkey: it outputs the variables that route the
 // workflow to the recent item's details.
@@ -24,7 +18,7 @@ var recentCmd = &cobra.Command{
 	Short: "open the most recently used item",
 	RunE: func(_ *cobra.Command, _ []string) error {
 		av := alfred.NewArgVars()
-		id, ok := recentID(loadUsage())
+		id, ok := wf.Usage.Recent(recentTTL)
 		if !ok {
 			return av.Arg("No recently used 1Password item").Var("action", "none").Send()
 		}

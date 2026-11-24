@@ -59,9 +59,6 @@ var (
 				})
 			}
 
-			usage := loadUsage()
-			items = util.FilterAndRankItems(items, query, cfg.FuzzySearch, usage.Scores(time.Now()))
-
 			// Sync status only shows on an empty query, or one asking for it, so
 			// it doesn't push matches down while typing.
 			showSync := query == "" || strings.Contains("update items sync", strings.ToLower(query))
@@ -70,6 +67,7 @@ var (
 				wf.Rerun(500 * time.Millisecond) // pick up the new items when the sync is done
 				if showSync {
 					wf.NewItem("Updating items…").
+						Pin().
 						Subtitle("Showing cached items until the update finishes").
 						Icon(util.IconUpdate).
 						Valid(false)
@@ -77,6 +75,7 @@ var (
 			case syncLocked:
 				if showSync {
 					wf.NewItem("Update items").
+						Pin().
 						Subtitle("1Password is locked. Press ⏎ to unlock and update.").
 						Icon(util.IconUpdate).
 						Var("action", actionSync).
@@ -85,13 +84,16 @@ var (
 						Valid(true)
 				}
 			}
-			if id, ok := recentID(usage); ok && query == "" {
+			if id, ok := wf.Usage.Recent(recentTTL); ok && query == "" {
 				addRecentItem(items, id)
 			}
 			for _, item := range items {
 				addListItem(item, query)
 			}
 
+			// Ranks by match, then usage; the status and recent rows are pinned.
+			wf.FuzzyMatch(cfg.FuzzySearch)
+			wf.Filter(query)
 			wf.Send()
 		},
 	}
@@ -106,9 +108,13 @@ func addListItem(item onepassword.Item, query string) *alfred.Item {
 		subtitle += "  •  " + item.PrimaryURL
 	}
 
-	// No UID: results are ranked here (match + frecency), so Alfred's knowledge must not reorder them.
 	it := wf.NewItem(item.Title).
 		Subtitle(subtitle).
+		UID(item.ID).
+		MatchOn(alfred.MatchSecondary, item.PrimaryURL).
+		MatchOn(alfred.MatchMeta, item.VaultName).
+		MatchOn(alfred.MatchMeta, item.Category).
+		MatchExact(item.ID).
 		Var("item_id", item.ID).
 		Var("item_name", item.Title).
 		Var("item_url", item.PrimaryURL).
@@ -142,7 +148,10 @@ func addListItem(item onepassword.Item, query string) *alfred.Item {
 func addRecentItem(items []onepassword.Item, id string) {
 	for _, item := range items {
 		if item.ID == id {
+			// Its own UID: the item's row below has the item's.
 			addListItem(item, "").
+				UID("recent").
+				Pin().
 				Title("↺ "+item.Title).
 				Subtitle("Recently used  •  ⏎ to show details").
 				Var("action", actionShowDetails).

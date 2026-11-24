@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
-	"github.com/rwilgaard/alfred-1password-search/src/internal/totp"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred/totp"
 	alfredui "github.com/rwilgaard/go-alfredutils/v2/alfred/ui"
 	"github.com/spf13/cobra"
 )
@@ -180,7 +180,7 @@ func uiTOTP(secret string, now time.Time) alfredui.Actions {
 		colour = alfredui.ColourError
 	}
 	return alfredui.NewUpdate().
-		Set(uiTOTPCode, alfredui.Props{"text": groupCode(code)}).
+		Set(uiTOTPCode, alfredui.Props{"text": totp.Group(code)}).
 		Set(uiTOTPBar, alfredui.Props{"progress": float64(remaining) / float64(k.Period), "colour": colour})
 }
 
@@ -242,13 +242,6 @@ func cachedAccountID(svc *onepassword.Service) (string, error) {
 		log.Printf("[ui] cache account id: %v", err)
 	}
 	return id, nil
-}
-
-func groupCode(code string) string {
-	if n := len(code); n >= 6 && n%2 == 0 {
-		return code[:n/2] + " " + code[n/2:]
-	}
-	return code
 }
 
 func emit(a alfredui.Actions) {
