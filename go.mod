@@ -3,7 +3,7 @@ module github.com/rwilgaard/alfred-1password-search
 go 1.27.4
 
 require (
-	github.com/rwilgaard/go-alfredutils/v2 v2.4.1
+	github.com/rwilgaard/go-alfredutils/v2 v2.5.0
 	github.com/sethvargo/go-password v0.3.1
 	github.com/spf13/cobra v1.10.2
 	go.deanishe.net/fuzzy v1.0.0
