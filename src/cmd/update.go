@@ -1,4 +1,3 @@
-// src/cmd/update.go
 package cmd
 
 import (

@@ -25,7 +25,6 @@ function run() {
 }
 `
 
-// Copy places value on the clipboard.
 func Copy(value string) error {
 	cmd := exec.Command("/usr/bin/osascript", "-l", "JavaScript", "-e", copyScript)
 	cmd.Stdin = strings.NewReader(value)

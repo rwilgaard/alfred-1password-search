@@ -38,7 +38,6 @@ type Field struct {
 	Purpose string
 }
 
-// Keys for the fields Lookup finds.
 const (
 	KeyPassword = "password"
 	KeyUsername = "username"
@@ -58,7 +57,6 @@ func (d *ItemDetail) Lookup(key string) (Field, bool) {
 	return Field{}, false
 }
 
-// Notes returns the item's notes, or "" if it has none.
 func (d *ItemDetail) Notes() string {
 	for _, f := range d.Fields {
 		if f.Purpose == "NOTES" {
@@ -119,18 +117,16 @@ type opAccount struct {
 	AccountUUID string `json:"account_uuid"`
 }
 
-// NewService returns a Service that runs the op binary on $PATH.
 func NewService() *Service {
 	return &Service{BinPath: "op", ExecCommand: exec.Command}
 }
 
-// IsAuthorized reports whether the CLI has an active session. Unlike other
-// commands, op whoami fails instead of prompting for Touch ID.
+// IsAuthorized never prompts: op whoami fails instead. It can report locked
+// when Alfred's processes are unlocked, so use it only to skip work.
 func (s *Service) IsAuthorized() bool {
 	return s.ExecCommand(s.BinPath, "whoami").Run() == nil
 }
 
-// Authorize prompts for 1Password's unlock (Touch ID or password) if needed.
 func (s *Service) Authorize() error {
 	if err := s.ExecCommand(s.BinPath, "user", "get", "--me").Run(); err != nil {
 		return fmt.Errorf("unlock 1Password: %w", err)
@@ -138,7 +134,7 @@ func (s *Service) Authorize() error {
 	return nil
 }
 
-// ListItems returns every item the CLI can see, without secrets.
+// ListItems returns items without their fields or secrets.
 func (s *Service) ListItems() ([]Item, error) {
 	out, err := s.ExecCommand(s.BinPath, "item", "list", "--format", "json").Output()
 	if err != nil {
@@ -155,7 +151,6 @@ func (s *Service) ListItems() ([]Item, error) {
 	return items, nil
 }
 
-// GetItem returns an item with its fields, secrets revealed.
 func (s *Service) GetItem(id string) (*ItemDetail, error) {
 	out, err := s.ExecCommand(s.BinPath, "item", "get", id, "--format", "json", "--reveal").Output()
 	if err != nil {
@@ -172,7 +167,6 @@ func (s *Service) GetItem(id string) (*ItemDetail, error) {
 	return &ItemDetail{Item: raw.item(), Fields: fields}, nil
 }
 
-// Vaults returns the distinct vaults of items, sorted by name.
 func Vaults(items []Item) []Vault {
 	seen := map[string]bool{}
 	var vaults []Vault

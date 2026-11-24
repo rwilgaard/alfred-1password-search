@@ -13,7 +13,6 @@ import (
 // recentTTL is how long the last used item stays pinned and reachable by the hotkey.
 const recentTTL = 5 * time.Minute
 
-// recentID returns the last used item if it was used within recentTTL.
 func recentID(s usage.Store) (string, bool) {
 	id, usedAt, ok := s.Latest()
 	return id, ok && time.Since(usedAt) < recentTTL

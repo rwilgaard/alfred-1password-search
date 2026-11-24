@@ -18,7 +18,6 @@ import (
 	"time"
 )
 
-// Key is a parsed TOTP secret.
 type Key struct {
 	Secret    []byte
 	Digits    int
@@ -75,7 +74,6 @@ func Parse(s string) (*Key, error) {
 	return k, nil
 }
 
-// Current returns the code for secret at the current time.
 func Current(secret string) (string, error) {
 	k, err := Parse(secret)
 	if err != nil {

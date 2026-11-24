@@ -37,7 +37,6 @@ func (s Store) Record(id string, now time.Time) {
 	s[id] = entry{Score: s[id].decayed(now) + 1, UsedAt: now.Unix()}
 }
 
-// Scores returns the current score for each item.
 func (s Store) Scores(now time.Time) map[string]float64 {
 	out := make(map[string]float64, len(s))
 	for id, e := range s {
@@ -46,7 +45,6 @@ func (s Store) Scores(now time.Time) map[string]float64 {
 	return out
 }
 
-// Latest returns the most recently used item.
 func (s Store) Latest() (id string, usedAt time.Time, ok bool) {
 	var latest int64
 	for k, e := range s {

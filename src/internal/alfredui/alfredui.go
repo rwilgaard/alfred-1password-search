@@ -8,17 +8,14 @@ import (
 	"os"
 )
 
-// Colours used for status messages.
 const (
 	ColourError   = "systemRedColor"
 	ColourInfo    = "secondaryLabelColor"
 	ColourSuccess = "systemGreenColor"
 )
 
-// Props maps component property names to values.
 type Props map[string]any
 
-// Update changes properties on existing components.
 type Update struct {
 	IDs map[string]Props `json:"ids"`
 }
@@ -41,7 +38,6 @@ type Pulse struct {
 	Interval float64 `json:"interval"`
 }
 
-// Actions is the top-level JSON object.
 type Actions struct {
 	Variables map[string]string `json:"variables,omitempty"`
 	Update    *Update           `json:"update,omitempty"`
@@ -50,13 +46,11 @@ type Actions struct {
 	Finish    *Finish           `json:"finish,omitempty"`
 }
 
-// Emit writes actions as JSON to stdout.
 func Emit(a Actions) error { return json.NewEncoder(os.Stdout).Encode(a) }
 
-// NewUpdate returns an empty update action.
 func NewUpdate() Actions { return Actions{Update: &Update{IDs: map[string]Props{}}} }
 
-// Set sets properties on the component with the given id.
+// Set merges p into the properties already set for id.
 func (a Actions) Set(id string, p Props) Actions {
 	if a.Update == nil {
 		a.Update = &Update{IDs: map[string]Props{}}
@@ -71,12 +65,10 @@ func (a Actions) Set(id string, p Props) Actions {
 	return a
 }
 
-// Status sets the text and colour of a label.
 func (a Actions) Status(labelID, msg, colour string) Actions {
 	return a.Set(labelID, Props{"text": msg, "colour": colour})
 }
 
-// Enable enables or disables components.
 func (a Actions) Enable(enabled bool, ids ...string) Actions {
 	for _, id := range ids {
 		a = a.Set(id, Props{"enabled": enabled})
@@ -84,7 +76,6 @@ func (a Actions) Enable(enabled bool, ids ...string) Actions {
 	return a
 }
 
-// SetVar sets a UI variable.
 func (a Actions) SetVar(k, v string) Actions {
 	if a.Variables == nil {
 		a.Variables = map[string]string{}
@@ -93,7 +84,6 @@ func (a Actions) SetVar(k, v string) Actions {
 	return a
 }
 
-// WithSheet adds a sheet action.
 func (a Actions) WithSheet(sh *Sheet) Actions {
 	a.Sheet = sh
 	return a

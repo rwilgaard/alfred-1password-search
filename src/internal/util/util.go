@@ -1,4 +1,3 @@
-// Package util holds the workflow's icons and helpers shared by the commands.
 package util
 
 import (
@@ -31,8 +30,6 @@ func GeneratePassword(length int, symbols bool, allowedSymbols string) (string, 
 
 const lastSyncDBTimeKey = "last_sync_db_time.json"
 
-// dbModTime returns the mtime of the 1Password app's database, which changes
-// whenever the vault data does.
 func dbModTime() (time.Time, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -45,8 +42,8 @@ func dbModTime() (time.Time, error) {
 	return fi.ModTime(), nil
 }
 
-// IsCacheStale reports whether 1Password has changed since the cache was
-// written. Without access to the database it falls back to a 2 hour age.
+// IsCacheStale compares the 1Password app's database mtime with the last
+// sync. Without access to the database it falls back to a 2 hour age.
 func IsCacheStale(wf *aw.Workflow, cacheKey string) bool {
 	cacheInfo, err := os.Stat(filepath.Join(wf.CacheDir(), cacheKey))
 	if err != nil {
@@ -63,15 +60,12 @@ func IsCacheStale(wf *aw.Workflow, cacheKey string) bool {
 	return dbTime.After(cacheInfo.ModTime())
 }
 
-// SaveLastSyncDbTime records the database mtime the cache was synced at.
 func SaveLastSyncDbTime(wf *aw.Workflow) {
 	if t, err := dbModTime(); err == nil {
 		_ = wf.Cache.StoreJSON(lastSyncDBTimeKey, t.UnixNano()) // best effort: staleness falls back to the cache mtime
 	}
 }
 
-// ParseVaults parses a slice of vault strings (which may be comma-separated)
-// into a clean list of trimmed, non-empty vault identifiers.
 func ParseVaults(inputs []string) []string {
 	var result []string
 	for _, input := range inputs {
@@ -85,9 +79,7 @@ func ParseVaults(inputs []string) []string {
 	return result
 }
 
-// MatchesVault checks whether the given item vault name or ID matches any of the target vaults.
-// If targetVaults is empty, it returns true (matches any vault).
-// Comparison is case-insensitive.
+// MatchesVault matches by name or ID, ignoring case. No targets match everything.
 func MatchesVault(vaultName, vaultID string, targetVaults []string) bool {
 	if len(targetVaults) == 0 {
 		return true

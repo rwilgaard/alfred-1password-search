@@ -100,10 +100,8 @@ func scoreItem(it onepassword.Item, query string, words []string, isFuzzy bool) 
 // prefix match (a 300 gap).
 const frecencyWeight = 50
 
-// FilterAndRankItems returns the items matching query, best first: title
-// matches rank well above URL, vault and category matches, and usage
-// (frecency scores by item ID, may be nil) breaks near-ties. With an empty
-// query all items are returned, ordered by usage.
+// FilterAndRankItems returns the matches best first. usage (frecency by item
+// ID, may be nil) only breaks near-ties, and orders an empty query.
 func FilterAndRankItems(items []onepassword.Item, query string, isFuzzy bool, usage map[string]float64) []onepassword.Item {
 	query = strings.ToLower(strings.TrimSpace(query))
 	if query == "" {

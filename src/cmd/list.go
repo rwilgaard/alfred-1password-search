@@ -139,7 +139,6 @@ func addListItem(item onepassword.Item, query string) *aw.Item {
 	return it
 }
 
-// addRecentItem puts the recently used item first, with ⏎ opening its details.
 func addRecentItem(items []onepassword.Item, id string) {
 	for _, item := range items {
 		if item.ID == id {

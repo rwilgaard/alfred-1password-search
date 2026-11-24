@@ -56,7 +56,6 @@ func copyField(itemID, key string) (string, error) {
 	return copySecret(value, f.Label)
 }
 
-// copySecret puts value on the clipboard and returns a message for the user.
 func copySecret(value, label string) (string, error) {
 	if err := clipboard.Copy(value); err != nil {
 		return "", err

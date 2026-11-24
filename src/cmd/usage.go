@@ -23,7 +23,6 @@ func loadUsage() usage.Store {
 	return s
 }
 
-// recordUse counts a use of the item for frecency ranking and the recent item.
 func recordUse(id string) {
 	s := loadUsage()
 	s.Record(id, time.Now())

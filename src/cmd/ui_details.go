@@ -42,10 +42,9 @@ const (
 
 const (
 	// uiScript runs the binary from a UI script action, relative to the .alfredui folder.
-	uiScript          = "../scripts/run.sh"
-	accountIDCacheKey = "account_id.json"
-	totpWarnSeconds   = 5
-	// showDetailsTrigger is the external trigger that opens the details window.
+	uiScript           = "../scripts/run.sh"
+	accountIDCacheKey  = "account_id.json"
+	totpWarnSeconds    = 5
 	showDetailsTrigger = "show_details"
 	// unlockPromptThreshold separates a normal op item get from one that
 	// waited on 1Password's unlock prompt.
@@ -95,7 +94,6 @@ var uiCopyCmd = &cobra.Command{
 }
 
 func uiDetails(itemID string) alfredui.Actions {
-	// Errors replace the big centred "Loading…" label.
 	fail := func(err error) alfredui.Actions {
 		log.Printf("[ui] %v", err)
 		return alfredui.NewUpdate().Status(uiLoading, err.Error()+"\nPress Esc to go back.", alfredui.ColourError)
@@ -248,7 +246,6 @@ func cachedAccountID(svc *onepassword.Service) (string, error) {
 	return id, nil
 }
 
-// groupCode splits a 6- or 8-digit code in half for readability.
 func groupCode(code string) string {
 	if n := len(code); n >= 6 && n%2 == 0 {
 		return code[:n/2] + " " + code[n/2:]

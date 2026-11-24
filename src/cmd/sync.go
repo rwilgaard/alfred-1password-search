@@ -18,9 +18,7 @@ const (
 	// syncLockedKey marks that an automatic sync was skipped because
 	// 1Password was locked. The list then offers a manual update instead.
 	syncLockedKey = "sync_locked"
-	// lockedRetry is how long the list waits before trying an automatic sync
-	// again after one found 1Password locked.
-	lockedRetry = 5 * time.Minute
+	lockedRetry   = 5 * time.Minute
 	// minSyncInterval limits automatic syncs, since the 1Password database
 	// changes far more often than the item list does.
 	minSyncInterval = time.Minute
@@ -57,10 +55,9 @@ var syncCmd = &cobra.Command{
 	},
 }
 
-// syncAndReopen backs the list's "Update items" row. It runs in the Run
-// Script Alfred started, where an unlock carries over to later op calls (a
-// detached job would prompt again). It reopens the list first, which shows
-// "Updating items…" while the syncingKey marker exists, then syncs.
+// syncAndReopen syncs inside the Run Script Alfred started, because an
+// unlock there carries over to later op calls and a detached job would
+// prompt again.
 func syncAndReopen(svc *onepassword.Service) error {
 	if err := svc.Authorize(); err != nil {
 		return reportError(err)
@@ -78,8 +75,6 @@ func syncAndReopen(svc *onepassword.Service) error {
 	return nil
 }
 
-// syncCache fetches the items from 1Password, writes them to the workflow
-// cache, and records the 1Password DB mtime so the cache counts as fresh.
 func syncCache(svc *onepassword.Service) error {
 	items, err := svc.ListItems()
 	if err != nil {
@@ -92,8 +87,7 @@ func syncCache(svc *onepassword.Service) error {
 	return wf.Cache.Store(syncLockedKey, nil) // nil deletes the marker
 }
 
-// startJob runs this binary with args as a detached background job. A job
-// of the same name that is already running counts as started.
+// startJob runs this binary detached. A job already running counts as started.
 func startJob(name string, args ...string) error {
 	exe, err := os.Executable()
 	if err != nil {
@@ -106,9 +100,8 @@ func startJob(name string, args ...string) error {
 	return err
 }
 
-// cachedItems loads the item cache for a Script Filter. On first run there
-// is none: it starts a sync, sends a placeholder that reruns until the data
-// is there, and returns false.
+// cachedItems returns false after sending a placeholder when there is no
+// cache yet. The caller must then return.
 func cachedItems() ([]onepassword.Item, bool) {
 	if !wf.Cache.Exists(itemsCacheKey) {
 		if err := startJob(syncJobName, "sync"); err != nil {
@@ -128,17 +121,15 @@ func cachedItems() ([]onepassword.Item, bool) {
 	return items, true
 }
 
-// syncState is what the list should show about the cache.
 type syncState int
 
 const (
-	syncFresh   syncState = iota
-	syncRunning           // a sync is in progress
-	syncLocked            // stale, and 1Password must be unlocked to update
+	syncFresh syncState = iota
+	syncRunning
+	syncLocked // stale, and only a manual update can unlock
 )
 
-// checkSync starts an automatic background sync when the cache is stale and
-// reports what the list should show.
+// checkSync also starts an automatic sync when the cache is stale.
 func checkSync() syncState {
 	if wf.IsRunning(syncJobName) || !wf.Cache.Expired(syncingKey, syncingMaxAge) {
 		return syncRunning
