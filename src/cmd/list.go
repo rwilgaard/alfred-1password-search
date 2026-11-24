@@ -89,7 +89,7 @@ var (
 				addRecentItem(items, id)
 			}
 			for _, item := range items {
-				addListItem(item, item.Title, query)
+				addListItem(item, query)
 			}
 
 			wf.Send()
@@ -97,7 +97,7 @@ var (
 	}
 )
 
-func addListItem(item onepassword.Item, title, query string) *alfred.Item {
+func addListItem(item onepassword.Item, query string) *alfred.Item {
 	subtitle := item.VaultName
 	if item.Category != "" {
 		subtitle += "  •  " + item.Category
@@ -107,7 +107,7 @@ func addListItem(item onepassword.Item, title, query string) *alfred.Item {
 	}
 
 	// No UID: results are ranked here (match + frecency), so Alfred's knowledge must not reorder them.
-	it := wf.NewItem(title).
+	it := wf.NewItem(item.Title).
 		Subtitle(subtitle).
 		Var("item_id", item.ID).
 		Var("item_name", item.Title).
@@ -142,7 +142,8 @@ func addListItem(item onepassword.Item, title, query string) *alfred.Item {
 func addRecentItem(items []onepassword.Item, id string) {
 	for _, item := range items {
 		if item.ID == id {
-			addListItem(item, "↺ "+item.Title, "").
+			addListItem(item, "").
+				Title("↺ "+item.Title).
 				Subtitle("Recently used  •  ⏎ to show details").
 				Var("action", actionShowDetails).
 				Arg(actionShowDetails)
