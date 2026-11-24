@@ -32,11 +32,13 @@ clean: ## Remove build artifacts
 	@rm -f workflow/$(PROJECT_NAME) workflow/$(PROJECT_NAME)-amd64 workflow/$(PROJECT_NAME)-arm64
 
 package-alfred: build universal-binary ## Build and package into .alfredworkflow
+	@rm -f $(PROJECT_NAME).alfredworkflow
 	@cd ./workflow && zip -r ../$(PROJECT_NAME).alfredworkflow ./*
 	@rm -f workflow/$(PROJECT_NAME)
 	@echo "Created $(PROJECT_NAME).alfredworkflow"
 
 zip-alfred: ## Package the workflow directory into .alfredworkflow without rebuilding
+	@rm -f $(PROJECT_NAME).alfredworkflow
 	@cd ./workflow && zip -r ../$(PROJECT_NAME).alfredworkflow ./*
 	@echo "Created $(PROJECT_NAME).alfredworkflow"
 

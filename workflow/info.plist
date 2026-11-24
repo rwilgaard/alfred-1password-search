@@ -256,7 +256,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</string>
+				<string>RECORD-SCRIPT</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -308,6 +308,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>RECENT-COND</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>RECORD-SCRIPT</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -1156,6 +1169,29 @@
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./alfred-1password-search record "$item_id"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>RECORD-SCRIPT</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
@@ -1206,7 +1242,7 @@
 		<key>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</key>
 		<dict>
 			<key>xpos</key>
-			<real>780.0</real>
+			<real>960.0</real>
 			<key>ypos</key>
 			<real>235.0</real>
 		</dict>
@@ -1348,6 +1384,13 @@
 			<real>175.0</real>
 			<key>ypos</key>
 			<real>1000.0</real>
+		</dict>
+		<key>RECORD-SCRIPT</key>
+		<dict>
+			<key>xpos</key>
+			<real>780.0</real>
+			<key>ypos</key>
+			<real>235.0</real>
 		</dict>
 		<key>SYNC-SCRIPT</key>
 		<dict>
@@ -1609,25 +1652,6 @@
 			<string>checkbox</string>
 			<key>variable</key>
 			<string>fuzzy_search</string>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>default</key>
-				<true/>
-				<key>required</key>
-				<false/>
-				<key>text</key>
-				<string></string>
-			</dict>
-			<key>description</key>
-			<string>Order results based on past usage.</string>
-			<key>label</key>
-			<string>Intelligent Ordering</string>
-			<key>type</key>
-			<string>checkbox</string>
-			<key>variable</key>
-			<string>intelligent_ordering</string>
 		</dict>
 		<dict>
 			<key>config</key>

@@ -19,7 +19,6 @@ type workflowConfig struct {
 	ModifierShift         string `env:"modifier_shift"`
 	AllowedSymbols        string `env:"allowed_symbols"`
 	FuzzySearch           bool   `env:"fuzzy_search"`
-	IntelligentOrdering   bool   `env:"intelligent_ordering"`
 	VaultName             string `env:"vault_name"`
 	SelectedVaults        string `env:"selected_vaults"`
 	SelectedVaultsKeyword string `env:"selected_vaults_keyword"`
@@ -60,9 +59,6 @@ func run() {
 	if err := alfredutils.CheckForUpdates(wf); err != nil {
 		wf.FatalError(err)
 	}
-	if cfg.IntelligentOrdering {
-		wf.Configure(aw.SuppressUIDs(false))
-	}
 	if err := rootCmd.Execute(); err != nil {
 		wf.FatalError(err)
 	}
@@ -78,7 +74,6 @@ func init() {
 	opts := []aw.Option{
 		aw.SortOptions(sopts...),
 		aw.MaxResults(25),
-		aw.SuppressUIDs(true),
 	}
 	// Alfred UI scripts get no alfred_workflow_version, and the updater panics without it.
 	if os.Getenv("alfred_workflow_version") != "" {

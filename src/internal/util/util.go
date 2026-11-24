@@ -11,7 +11,10 @@ import (
 	"github.com/sethvargo/go-password/password"
 )
 
-var IconFolder = &aw.Icon{Value: "icons/vault.png"}
+var (
+	IconFolder = &aw.Icon{Value: "icons/vault.png"}
+	IconUpdate = &aw.Icon{Value: "icons/update.png"}
+)
 
 func GeneratePassword(length int, symbols bool, allowedSymbols string) (string, error) {
 	input := password.GeneratorInput{Symbols: allowedSymbols}

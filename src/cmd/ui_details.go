@@ -105,7 +105,7 @@ func uiDetails(itemID string) alfredui.Actions {
 	if err != nil {
 		return fail(err)
 	}
-	rememberItem(item.ID, item.Title)
+	recordUse(item.ID)
 
 	subtitle := item.VaultName
 	if item.Category != "" {

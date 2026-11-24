@@ -44,7 +44,7 @@ func copyField(itemID, key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	rememberItem(item.ID, item.Title)
+	recordUse(item.ID)
 
 	f, ok := item.Lookup(key)
 	if !ok {

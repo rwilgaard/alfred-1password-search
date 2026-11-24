@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"strings"
+	"time"
 
 	aw "github.com/deanishe/awgo"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
@@ -73,15 +74,13 @@ var (
 				}
 			}
 
-			items := util.FilterAndRankItems(vaultFiltered, query, cfg.FuzzySearch)
+			usage := loadUsage()
+			items := util.FilterAndRankItems(vaultFiltered, query, cfg.FuzzySearch, usage.Scores(time.Now()))
 
 			updateAvailable := util.IsCacheStale(wf, itemsCacheKey) && (len(query) == 0 || strings.Contains("update items sync", strings.ToLower(query)))
 
-			if updateAvailable {
-				wf.Configure(aw.SuppressUIDs(true))
-			}
-			if query == "" {
-				addRecentItem(items)
+			if id, ok := recentID(usage); ok && query == "" {
+				addRecentItem(items, id)
 			}
 			for _, item := range items {
 				addListItem(item, query)
@@ -90,7 +89,7 @@ var (
 			if updateAvailable {
 				wf.NewItem("Update items").
 					Subtitle("1Password vault has changed. Press ⏎ to update.").
-					Icon(util.IconFolder).
+					Icon(util.IconUpdate).
 					Match("Update items sync").
 					Var("action", actionSync).
 					Var("list_query", query).
@@ -119,9 +118,9 @@ func addListItem(item onepassword.Item, query string) *aw.Item {
 		subtitle += "  •  " + item.PrimaryURL
 	}
 
+	// No UID: results are ranked here (match + frecency), so Alfred's knowledge must not reorder them.
 	it := wf.NewItem(item.Title).
 		Subtitle(subtitle).
-		UID(item.ID).
 		Var("item_id", item.ID).
 		Var("item_name", item.Title).
 		Var("item_url", item.PrimaryURL).
@@ -151,18 +150,10 @@ func addListItem(item onepassword.Item, query string) *aw.Item {
 	return it
 }
 
-// addRecentItem puts the recently used item first, with ⏎ opening its
-// details. Alfred orders results by what it has learned for each UID, which
-// would push it down, so this list is sent without UIDs. Typed searches keep
-// them, so learned ranking still applies there.
-func addRecentItem(items []onepassword.Item) {
-	r, ok := loadRecent()
-	if !ok {
-		return
-	}
+// addRecentItem puts the recently used item first, with ⏎ opening its details.
+func addRecentItem(items []onepassword.Item, id string) {
 	for _, item := range items {
-		if item.ID == r.ID {
-			wf.Configure(aw.SuppressUIDs(true)) // before any item is created
+		if item.ID == id {
 			addListItem(item, "").
 				Title("↺ "+item.Title).
 				Subtitle("Recently used  •  ⏎ to show details").

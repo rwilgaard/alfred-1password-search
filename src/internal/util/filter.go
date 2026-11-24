@@ -1,6 +1,9 @@
 package util
 
 import (
+	"cmp"
+	"math"
+	"slices"
 	"sort"
 	"strings"
 
@@ -108,17 +111,31 @@ func ScoreItem(it onepassword.Item, query string, isFuzzy bool) (float64, bool) 
 	return totalScore, true
 }
 
+// frecencyWeight scales the usage boost. Heavy use (score ~50) adds ~280, enough
+// to reorder items within a match tier but not to lift a contains match over a
+// prefix match (a 300 gap).
+const frecencyWeight = 50
+
 // FilterAndRankItems filters and ranks items based on how well their fields match the query.
 // Items with matching Title and ID rank significantly higher than items matching URL, VaultName, or Category.
-func FilterAndRankItems(items []onepassword.Item, query string, isFuzzy bool) []onepassword.Item {
+// usage holds frecency scores by item ID (may be nil); with an empty query items are ordered by it.
+func FilterAndRankItems(items []onepassword.Item, query string, isFuzzy bool, usage map[string]float64) []onepassword.Item {
 	query = strings.TrimSpace(query)
 	if query == "" {
-		return items
+		if len(usage) == 0 {
+			return items
+		}
+		sorted := slices.Clone(items)
+		slices.SortStableFunc(sorted, func(a, b onepassword.Item) int {
+			return cmp.Compare(usage[b.ID], usage[a.ID])
+		})
+		return sorted
 	}
 
 	var scored []scoredItem
 	for _, item := range items {
 		if s, matched := ScoreItem(item, query, isFuzzy); matched {
+			s += frecencyWeight * math.Log2(1+usage[item.ID])
 			scored = append(scored, scoredItem{item: item, score: s})
 		}
 	}

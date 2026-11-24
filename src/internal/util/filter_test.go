@@ -47,7 +47,7 @@ func TestFilterAndRankItems(t *testing.T) {
 	}
 
 	t.Run("title match ranks above url match", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "github", true)
+		res := util.FilterAndRankItems(items, "github", true, nil)
 		if len(res) < 3 {
 			t.Fatalf("expected at least 3 matches, got %d", len(res))
 		}
@@ -65,7 +65,7 @@ func TestFilterAndRankItems(t *testing.T) {
 	})
 
 	t.Run("id match ranks above url-only match", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "id-special-aws", true)
+		res := util.FilterAndRankItems(items, "id-special-aws", true, nil)
 		if len(res) == 0 {
 			t.Fatal("expected match, got 0")
 		}
@@ -75,7 +75,7 @@ func TestFilterAndRankItems(t *testing.T) {
 	})
 
 	t.Run("multi-word query across title and vault", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "github work", true)
+		res := util.FilterAndRankItems(items, "github work", true, nil)
 		if len(res) != 1 {
 			t.Fatalf("expected exactly 1 match ('GitHub Enterprise' in Work vault), got %d", len(res))
 		}
@@ -85,21 +85,51 @@ func TestFilterAndRankItems(t *testing.T) {
 	})
 
 	t.Run("empty query returns all items in original order", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "", true)
+		res := util.FilterAndRankItems(items, "", true, nil)
 		if len(res) != len(items) {
 			t.Fatalf("expected %d items, got %d", len(items), len(res))
 		}
 	})
 
+	t.Run("empty query orders by usage, unused keep their order", func(t *testing.T) {
+		usage := map[string]float64{"id-aws": 3, "id-resources": 1}
+		res := util.FilterAndRankItems(items, "", true, usage)
+		want := []string{"id-aws", "id-resources", "id-github", "id-ghe", "id-special-aws"}
+		for i, id := range want {
+			if res[i].ID != id {
+				t.Fatalf("res[%d] = %q, want %q", i, res[i].ID, id)
+			}
+		}
+		if items[0].ID != "id-github" {
+			t.Error("input slice was reordered")
+		}
+	})
+
+	t.Run("usage reorders within a match tier", func(t *testing.T) {
+		// Both titles start with "github"; heavy use of the Enterprise entry lifts it.
+		res := util.FilterAndRankItems(items, "githu", false, map[string]float64{"id-ghe": 20})
+		if res[0].ID != "id-ghe" {
+			t.Errorf("res[0] = %q, want id-ghe", res[0].ID)
+		}
+	})
+
+	t.Run("usage does not beat a stronger match", func(t *testing.T) {
+		// Exact title match outranks a heavily used URL-only match.
+		res := util.FilterAndRankItems(items, "github", true, map[string]float64{"id-resources": 50})
+		if res[0].ID != "id-github" {
+			t.Errorf("res[0] = %q, want id-github", res[0].ID)
+		}
+	})
+
 	t.Run("non-matching query returns empty", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "nonexistent-query-xyz", true)
+		res := util.FilterAndRankItems(items, "nonexistent-query-xyz", true, nil)
 		if len(res) != 0 {
 			t.Fatalf("expected 0 items, got %d", len(res))
 		}
 	})
 
 	t.Run("non-fuzzy search matches substrings with field ranking", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "aws", false)
+		res := util.FilterAndRankItems(items, "aws", false, nil)
 		if len(res) < 2 {
 			t.Fatalf("expected at least 2 matches for 'aws', got %d", len(res))
 		}
