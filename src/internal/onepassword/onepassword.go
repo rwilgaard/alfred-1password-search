@@ -1,4 +1,4 @@
-// src/internal/onepassword/onepassword.go
+// Package onepassword wraps the op CLI.
 package onepassword
 
 import (
@@ -6,8 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"slices"
+	"strings"
 )
 
+// Service runs op. ExecCommand is swappable so tests can stub the CLI.
 type Service struct {
 	BinPath     string
 	ExecCommand func(name string, arg ...string) *exec.Cmd
@@ -23,13 +26,8 @@ type Item struct {
 }
 
 type ItemDetail struct {
-	ID         string
-	Title      string
-	Category   string
-	VaultID    string
-	VaultName  string
-	PrimaryURL string
-	Fields     []Field
+	Item
+	Fields []Field
 }
 
 type Field struct {
@@ -38,7 +36,6 @@ type Field struct {
 	Type    string
 	Value   string
 	Purpose string
-	TOTP    string // current one-time code, only set on OTP fields
 }
 
 // Keys for the fields Lookup finds.
@@ -92,74 +89,59 @@ type opField struct {
 	Type    string `json:"type"`
 	Value   string `json:"value"`
 	Purpose string `json:"purpose"`
-	TOTP    string `json:"totp"`
 }
 
-type opItemList struct {
-	ID                    string  `json:"id"`
-	Title                 string  `json:"title"`
-	Category              string  `json:"category"`
-	Vault                 opVault `json:"vault"`
-	URLs                  []opURL `json:"urls"`
-	AdditionalInformation string  `json:"additional_information"`
+type opItem struct {
+	ID       string  `json:"id"`
+	Title    string  `json:"title"`
+	Category string  `json:"category"`
+	Vault    opVault `json:"vault"`
+	URLs     []opURL `json:"urls"`
+}
+
+func (r opItem) item() Item {
+	return Item{
+		ID:         r.ID,
+		Title:      r.Title,
+		Category:   r.Category,
+		VaultID:    r.Vault.ID,
+		VaultName:  r.Vault.Name,
+		PrimaryURL: primaryURL(r.URLs),
+	}
 }
 
 type opItemDetail struct {
-	ID       string    `json:"id"`
-	Title    string    `json:"title"`
-	Category string    `json:"category"`
-	Vault    opVault   `json:"vault"`
-	Fields   []opField `json:"fields"`
-	URLs     []opURL   `json:"urls"`
+	opItem
+	Fields []opField `json:"fields"`
 }
 
 type opAccount struct {
 	AccountUUID string `json:"account_uuid"`
 }
 
-func NewService(binPath string) (*Service, error) {
-	if binPath == "" {
-		return nil, errors.New("binPath is empty")
-	}
-	return &Service{
-		BinPath:     binPath,
-		ExecCommand: exec.Command,
-	}, nil
+// NewService returns a Service that runs the op binary on $PATH.
+func NewService() *Service {
+	return &Service{BinPath: "op", ExecCommand: exec.Command}
 }
 
-func (s *Service) IsUnlocked() bool {
-	cmd := s.ExecCommand(s.BinPath, "user", "get", "--me")
-	err := cmd.Run()
-	return err == nil
-}
-
-func (s *Service) ListItems(vaultName string) ([]Item, error) {
-	args := []string{"item", "list", "--format", "json"}
-	if vaultName != "" {
-		args = append(args, "--vault", vaultName)
-	}
-	out, err := s.ExecCommand(s.BinPath, args...).Output()
+// ListItems returns every item the CLI can see, without secrets.
+func (s *Service) ListItems() ([]Item, error) {
+	out, err := s.ExecCommand(s.BinPath, "item", "list", "--format", "json").Output()
 	if err != nil {
 		return nil, fmt.Errorf("op item list: %w", err)
 	}
-	var raw []opItemList
+	var raw []opItem
 	if err := json.Unmarshal(out, &raw); err != nil {
 		return nil, fmt.Errorf("parse op item list: %w", err)
 	}
 	items := make([]Item, len(raw))
 	for i, r := range raw {
-		items[i] = Item{
-			ID:         r.ID,
-			Title:      r.Title,
-			Category:   r.Category,
-			VaultID:    r.Vault.ID,
-			VaultName:  r.Vault.Name,
-			PrimaryURL: primaryURL(r.URLs),
-		}
+		items[i] = r.item()
 	}
 	return items, nil
 }
 
+// GetItem returns an item with its fields, secrets revealed.
 func (s *Service) GetItem(id string) (*ItemDetail, error) {
 	out, err := s.ExecCommand(s.BinPath, "item", "get", id, "--format", "json", "--reveal").Output()
 	if err != nil {
@@ -173,34 +155,23 @@ func (s *Service) GetItem(id string) (*ItemDetail, error) {
 	for i, f := range raw.Fields {
 		fields[i] = Field(f)
 	}
-	return &ItemDetail{
-		ID:         raw.ID,
-		Title:      raw.Title,
-		Category:   raw.Category,
-		VaultID:    raw.Vault.ID,
-		VaultName:  raw.Vault.Name,
-		PrimaryURL: primaryURL(raw.URLs),
-		Fields:     fields,
-	}, nil
+	return &ItemDetail{Item: raw.item(), Fields: fields}, nil
 }
 
-func (s *Service) ListVaults() ([]Vault, error) {
-	out, err := s.ExecCommand(s.BinPath, "vault", "list", "--format", "json").Output()
-	if err != nil {
-		return nil, fmt.Errorf("op vault list: %w", err)
+// Vaults returns the distinct vaults of items, sorted by name.
+func Vaults(items []Item) []Vault {
+	seen := map[string]bool{}
+	var vaults []Vault
+	for _, it := range items {
+		if !seen[it.VaultID] {
+			seen[it.VaultID] = true
+			vaults = append(vaults, Vault{ID: it.VaultID, Name: it.VaultName})
+		}
 	}
-	var raw []struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
-	}
-	if err := json.Unmarshal(out, &raw); err != nil {
-		return nil, fmt.Errorf("parse op vault list: %w", err)
-	}
-	vaults := make([]Vault, len(raw))
-	for i, v := range raw {
-		vaults[i] = Vault{ID: v.ID, Name: v.Name}
-	}
-	return vaults, nil
+	slices.SortFunc(vaults, func(a, b Vault) int {
+		return strings.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name))
+	})
+	return vaults
 }
 
 func (s *Service) GetAccountID() (string, error) {

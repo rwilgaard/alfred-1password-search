@@ -36,10 +36,7 @@ var copyCmd = &cobra.Command{
 }
 
 func copyField(itemID, key string) (string, error) {
-	svc, err := onepassword.NewService("op")
-	if err != nil {
-		return "", err
-	}
+	svc := onepassword.NewService()
 	item, err := svc.GetItem(itemID)
 	if err != nil {
 		return "", err

@@ -122,19 +122,6 @@
 				<true/>
 			</dict>
 		</array>
-		<key>6995268F-3A33-4F50-B0A5-E1E9048B1825</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>46DEC540-50A4-4114-A51D-867240CC7AF7</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
 		<key>6D7E8F9A-0B1C-2D3E-4F5A-6B7C8D9E0F1A</key>
 		<array>
 			<dict>
@@ -758,55 +745,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>0</integer>
-				<key>script</key>
-				<string>export OP_NO_UPDATE=true; op user get --me &gt;/dev/null 2&gt;&amp;1</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>inboundconfig</key>
-			<dict>
-				<key>externalid</key>
-				<string>show_item_auth</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>6995268F-3A33-4F50-B0A5-E1E9048B1825</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>lastpathcomponent</key>
-				<false/>
-				<key>onlyshowifquerypopulated</key>
-				<false/>
-				<key>removeextension</key>
-				<false/>
-				<key>text</key>
-				<string>HURRA</string>
-				<key>title</key>
-				<string>1Password Search</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.notification</string>
-			<key>uid</key>
-			<string>46DEC540-50A4-4114-A51D-867240CC7AF7</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>alfredfiltersresults</key>
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
@@ -1232,26 +1170,12 @@
 			<key>ypos</key>
 			<real>345.0</real>
 		</dict>
-		<key>46DEC540-50A4-4114-A51D-867240CC7AF7</key>
-		<dict>
-			<key>xpos</key>
-			<real>1175.0</real>
-			<key>ypos</key>
-			<real>600.0</real>
-		</dict>
 		<key>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</key>
 		<dict>
 			<key>xpos</key>
 			<real>960.0</real>
 			<key>ypos</key>
 			<real>235.0</real>
-		</dict>
-		<key>6995268F-3A33-4F50-B0A5-E1E9048B1825</key>
-		<dict>
-			<key>xpos</key>
-			<real>1010.0</real>
-			<key>ypos</key>
-			<real>600.0</real>
 		</dict>
 		<key>6D7E8F9A-0B1C-2D3E-4F5A-6B7C8D9E0F1A</key>
 		<dict>

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	aw "github.com/deanishe/awgo"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
 	"github.com/rwilgaard/go-alfredutils/alfredutils"
@@ -14,21 +13,8 @@ var vaultsCmd = &cobra.Command{
 	SilenceUsage: true,
 	Args:         cobra.ExactArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
-		var vaults []onepassword.Vault
-		if err := alfredutils.LoadCache(wf, vaultsCacheKey, &vaults); err != nil {
-			wf.FatalError(err)
-		}
-
-		if !wf.Cache.Exists(vaultsCacheKey) {
-			wf.Rerun(0.5)
-			wf.NewItem("Fetching 1Password vaults...").
-				Subtitle("Please wait a moment").
-				Icon(aw.IconInfo)
-			// If cache doesn't exist, we must run RefreshCache regardless of lock status to initialize the workflow.
-			if err := alfredutils.RefreshCache(wf, vaultsCacheKey, cacheMaxAge, []string{syncJobName}); err != nil {
-				wf.FatalError(err)
-			}
-			alfredutils.HandleFeedback(wf)
+		items, ok := cachedItems()
+		if !ok {
 			return
 		}
 
@@ -39,7 +25,7 @@ var vaultsCmd = &cobra.Command{
 			Var("vault_name", "").
 			Valid(true)
 
-		for _, v := range vaults {
+		for _, v := range onepassword.Vaults(items) {
 			wf.NewItem(v.Name).
 				UID(v.ID).
 				Icon(util.IconFolder).
@@ -47,7 +33,9 @@ var vaultsCmd = &cobra.Command{
 				Valid(true)
 		}
 
-		wf.Filter(args[0])
+		if args[0] != "" {
+			wf.Filter(args[0])
+		}
 		alfredutils.HandleFeedback(wf)
 	},
 }

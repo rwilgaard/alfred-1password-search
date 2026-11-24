@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 
+	aw "github.com/deanishe/awgo"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
+	"github.com/rwilgaard/go-alfredutils/alfredutils"
 	"github.com/spf13/cobra"
 )
 
@@ -31,32 +33,40 @@ var syncCmd = &cobra.Command{
 	},
 }
 
-// syncCache fetches vaults and items from 1Password, writes them to the
-// workflow cache, and records the 1Password DB mtime so the cache counts as fresh.
+// syncCache fetches the items from 1Password, writes them to the workflow
+// cache, and records the 1Password DB mtime so the cache counts as fresh.
 func syncCache() error {
-	svc, err := onepassword.NewService("op")
-	if err != nil {
-		return err
-	}
-
-	vaults, err := svc.ListVaults()
-	if err != nil {
-		return fmt.Errorf("could not fetch vaults: %w", err)
-	}
-	if err := wf.Cache.StoreJSON(vaultsCacheKey, vaults); err != nil {
-		return fmt.Errorf("could not write vault cache: %w", err)
-	}
-
-	items, err := svc.ListItems("")
+	items, err := onepassword.NewService().ListItems()
 	if err != nil {
 		return fmt.Errorf("could not fetch items: %w", err)
 	}
 	if err := wf.Cache.StoreJSON(itemsCacheKey, items); err != nil {
 		return fmt.Errorf("could not write item cache: %w", err)
 	}
-
 	util.SaveLastSyncDbTime(wf)
 	return nil
+}
+
+// cachedItems loads the item cache for a Script Filter. On first run there
+// is none: it starts a sync, sends a placeholder that reruns until the data
+// is there, and returns false.
+func cachedItems() ([]onepassword.Item, bool) {
+	if !wf.Cache.Exists(itemsCacheKey) {
+		wf.Rerun(0.5)
+		wf.NewItem("Fetching 1Password items...").
+			Subtitle("Please wait a moment").
+			Icon(aw.IconInfo)
+		if err := alfredutils.RefreshCache(wf, itemsCacheKey, cacheMaxAge, []string{syncJobName}); err != nil {
+			wf.FatalError(err)
+		}
+		alfredutils.HandleFeedback(wf)
+		return nil, false
+	}
+	var items []onepassword.Item
+	if err := wf.Cache.LoadJSON(itemsCacheKey, &items); err != nil {
+		wf.FatalError(err)
+	}
+	return items, true
 }
 
 func init() {

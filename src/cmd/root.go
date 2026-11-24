@@ -29,12 +29,10 @@ type workflowConfig struct {
 const repo = "rwilgaard/alfred-1password-search"
 
 const (
-	itemsCacheKey  = "items.json"
-	vaultsCacheKey = "vaults.json"
-	syncJobName    = "sync"
+	itemsCacheKey = "items.json"
+	syncJobName   = "sync"
+	cacheMaxAge   = 120 * time.Minute
 )
-
-var cacheMaxAge = 120 * time.Minute
 
 var (
 	wf  *aw.Workflow

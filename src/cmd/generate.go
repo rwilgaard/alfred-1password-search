@@ -1,4 +1,3 @@
-// src/cmd/generate.go
 package cmd
 
 import (

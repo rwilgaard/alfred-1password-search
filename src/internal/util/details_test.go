@@ -9,8 +9,7 @@ import (
 
 func TestDetailRows(t *testing.T) {
 	item := &onepassword.ItemDetail{
-		Title:      "Gmail",
-		PrimaryURL: "https://gmail.com",
+		Item: onepassword.Item{Title: "Gmail", PrimaryURL: "https://gmail.com"},
 		Fields: []onepassword.Field{
 			{ID: "username", Label: "username", Type: "STRING", Value: "me@gmail.com"},
 			{ID: "password", Label: "password", Type: "CONCEALED", Value: "s3cret"},

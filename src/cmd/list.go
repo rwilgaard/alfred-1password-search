@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -49,59 +50,33 @@ var (
 				targetVaults = util.ParseVaults([]string{cfg.VaultName})
 			}
 
-			var rawItems []onepassword.Item
-			if err := alfredutils.LoadCache(wf, itemsCacheKey, &rawItems); err != nil {
-				wf.FatalError(err)
-			}
-
-			if !wf.Cache.Exists(itemsCacheKey) {
-				wf.Rerun(0.5)
-				wf.NewItem("Fetching 1Password items...").
-					Subtitle("Please wait a moment").
-					Icon(aw.IconInfo)
-				// If cache doesn't exist, we must run RefreshCache regardless of lock status to initialize the workflow.
-				if err := alfredutils.RefreshCache(wf, itemsCacheKey, cacheMaxAge, []string{syncJobName}); err != nil {
-					wf.FatalError(err)
-				}
-				alfredutils.HandleFeedback(wf)
+			items, ok := cachedItems()
+			if !ok {
 				return
 			}
-
-			var vaultFiltered []onepassword.Item
-			for _, item := range rawItems {
-				if util.MatchesVault(item.VaultName, item.VaultID, targetVaults) {
-					vaultFiltered = append(vaultFiltered, item)
-				}
+			if len(targetVaults) > 0 {
+				items = slices.DeleteFunc(items, func(it onepassword.Item) bool {
+					return !util.MatchesVault(it.VaultName, it.VaultID, targetVaults)
+				})
 			}
 
 			usage := loadUsage()
-			items := util.FilterAndRankItems(vaultFiltered, query, cfg.FuzzySearch, usage.Scores(time.Now()))
+			items = util.FilterAndRankItems(items, query, cfg.FuzzySearch, usage.Scores(time.Now()))
 
-			updateAvailable := util.IsCacheStale(wf, itemsCacheKey) && (len(query) == 0 || strings.Contains("update items sync", strings.ToLower(query)))
-
+			if (query == "" || strings.Contains("update items sync", strings.ToLower(query))) && util.IsCacheStale(wf, itemsCacheKey) {
+				wf.NewItem("Update items").
+					Subtitle("1Password vault has changed. Press ⏎ to update.").
+					Icon(util.IconUpdate).
+					Var("action", actionSync).
+					Var("list_query", query).
+					Arg(actionSync).
+					Valid(true)
+			}
 			if id, ok := recentID(usage); ok && query == "" {
 				addRecentItem(items, id)
 			}
 			for _, item := range items {
 				addListItem(item, query)
-			}
-
-			if updateAvailable {
-				wf.NewItem("Update items").
-					Subtitle("1Password vault has changed. Press ⏎ to update.").
-					Icon(util.IconUpdate).
-					Match("Update items sync").
-					Var("action", actionSync).
-					Var("list_query", query).
-					Arg(actionSync).
-					Valid(true)
-
-				items := wf.Feedback.Items
-				if len(items) > 1 {
-					item := items[len(items)-1]
-					copy(items[1:], items[:len(items)-1])
-					items[0] = item
-				}
 			}
 
 			alfredutils.HandleFeedback(wf)

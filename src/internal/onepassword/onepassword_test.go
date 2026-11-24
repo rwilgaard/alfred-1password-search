@@ -1,4 +1,3 @@
-// src/internal/onepassword/onepassword_test.go
 package onepassword_test
 
 import (
@@ -20,54 +19,11 @@ func mockFail() func(string, ...string) *exec.Cmd {
 	}
 }
 
-func TestNewService(t *testing.T) {
-	_, err := onepassword.NewService("")
-	if err == nil {
-		t.Fatal("expected error for empty binPath")
-	}
-	svc, err := onepassword.NewService("op")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if svc == nil {
-		t.Fatal("expected non-nil service")
-	}
-}
-
-func TestIsUnlocked(t *testing.T) {
-	tests := []struct {
-		name string
-		mock func(string, ...string) *exec.Cmd
-		want bool
-	}{
-		{
-			name: "is unlocked",
-			mock: mockOK(`{}`),
-			want: true,
-		},
-		{
-			name: "is locked",
-			mock: mockFail(),
-			want: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			svc := &onepassword.Service{BinPath: "op", ExecCommand: tt.mock}
-			if got := svc.IsUnlocked(); got != tt.want {
-				t.Errorf("IsUnlocked() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestListItems(t *testing.T) {
 	const mockJSON = `[{"id":"abc123","title":"Gmail","category":"LOGIN","vault":{"id":"vlt1","name":"Personal"},"additional_information":"user@gmail.com","urls":[{"href":"https://gmail.com","primary":true}]}]`
 
 	tests := []struct {
 		name      string
-		vault     string
 		mock      func(string, ...string) *exec.Cmd
 		wantLen   int
 		wantErr   bool
@@ -75,7 +31,6 @@ func TestListItems(t *testing.T) {
 	}{
 		{
 			name:    "lists all items",
-			vault:   "",
 			mock:    mockOK(mockJSON),
 			wantLen: 1,
 			wantFirst: onepassword.Item{
@@ -86,12 +41,6 @@ func TestListItems(t *testing.T) {
 				VaultName:  "Personal",
 				PrimaryURL: "https://gmail.com",
 			},
-		},
-		{
-			name:    "empty vault returns all",
-			vault:   "Personal",
-			mock:    mockOK(mockJSON),
-			wantLen: 1,
 		},
 		{
 			name:    "command failure returns error",
@@ -108,7 +57,7 @@ func TestListItems(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			svc := &onepassword.Service{BinPath: "op", ExecCommand: tt.mock}
-			items, err := svc.ListItems(tt.vault)
+			items, err := svc.ListItems()
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("ListItems() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -126,7 +75,7 @@ func TestListItems(t *testing.T) {
 }
 
 func TestGetItem(t *testing.T) {
-	const mockJSON = `{"id":"abc123","title":"Gmail","category":"LOGIN","vault":{"id":"vlt1","name":"Personal"},"fields":[{"id":"username","label":"username","type":"STRING","purpose":"USERNAME","value":"user@gmail.com"},{"id":"password","label":"password","type":"CONCEALED","purpose":"PASSWORD","value":"s3cret"},{"id":"notesPlain","label":"notesPlain","type":"STRING","purpose":"NOTES","value":"some notes"},{"id":"TOTP_x","label":"one-time password","type":"OTP","value":"otpauth://totp/x?secret=ABC","totp":"123456"}],"urls":[{"href":"https://gmail.com","primary":true}]}`
+	const mockJSON = `{"id":"abc123","title":"Gmail","category":"LOGIN","vault":{"id":"vlt1","name":"Personal"},"fields":[{"id":"username","label":"username","type":"STRING","purpose":"USERNAME","value":"user@gmail.com"},{"id":"password","label":"password","type":"CONCEALED","purpose":"PASSWORD","value":"s3cret"},{"id":"notesPlain","label":"notesPlain","type":"STRING","purpose":"NOTES","value":"some notes"},{"id":"TOTP_x","label":"one-time password","type":"OTP","value":"otpauth://totp/x?secret=ABC"}],"urls":[{"href":"https://gmail.com","primary":true}]}`
 
 	tests := []struct {
 		name    string
@@ -147,8 +96,8 @@ func TestGetItem(t *testing.T) {
 				if len(item.Fields) != 4 {
 					t.Fatalf("got %d fields, want 4", len(item.Fields))
 				}
-				if item.Fields[3].TOTP != "123456" {
-					t.Errorf("OTP totp = %q, want 123456", item.Fields[3].TOTP)
+				if item.VaultName != "Personal" {
+					t.Errorf("VaultName = %q, want Personal", item.VaultName)
 				}
 				if item.Fields[1].Type != "CONCEALED" {
 					t.Errorf("password type = %q, want CONCEALED", item.Fields[1].Type)
@@ -183,7 +132,7 @@ func TestLookupAndNotes(t *testing.T) {
 	item := &onepassword.ItemDetail{Fields: []onepassword.Field{
 		{Label: "login", Purpose: "USERNAME", Value: "me"},
 		{Label: "renamed", Type: "CONCEALED", Purpose: "PASSWORD", Value: "s3cret"},
-		{Label: "one-time password", Type: "OTP", Value: "otpauth://x", TOTP: "123456"},
+		{Label: "one-time password", Type: "OTP", Value: "otpauth://x"},
 		{Label: "notesPlain", Purpose: "NOTES", Value: "hi"},
 	}}
 
@@ -212,19 +161,21 @@ func TestLookupAndNotes(t *testing.T) {
 	}
 }
 
-func TestListVaults(t *testing.T) {
-	const mockJSON = `[{"id":"vlt1","name":"Personal"},{"id":"vlt2","name":"Work"}]`
-
-	svc := &onepassword.Service{BinPath: "op", ExecCommand: mockOK(mockJSON)}
-	vaults, err := svc.ListVaults()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+func TestVaults(t *testing.T) {
+	items := []onepassword.Item{
+		{VaultID: "v2", VaultName: "work"},
+		{VaultID: "v1", VaultName: "Personal"},
+		{VaultID: "v2", VaultName: "work"},
 	}
-	if len(vaults) != 2 {
-		t.Fatalf("got %d vaults, want 2", len(vaults))
+	got := onepassword.Vaults(items)
+	want := []onepassword.Vault{{ID: "v1", Name: "Personal"}, {ID: "v2", Name: "work"}}
+	if len(got) != len(want) {
+		t.Fatalf("got %+v, want %+v", got, want)
 	}
-	if vaults[0].Name != "Personal" {
-		t.Errorf("got %q, want Personal", vaults[0].Name)
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("got[%d] = %+v, want %+v", i, got[i], want[i])
+		}
 	}
 }
 

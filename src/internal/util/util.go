@@ -1,4 +1,4 @@
-// src/internal/util/util.go
+// Package util holds the workflow's icons and helpers shared by the commands.
 package util
 
 import (
@@ -29,49 +29,45 @@ func GeneratePassword(length int, symbols bool, allowedSymbols string) (string, 
 	return gen.Generate(length, length/4, sc, false, true)
 }
 
-func IsCacheStale(wf *aw.Workflow, cacheKey string) bool {
-	cachePath := filepath.Join(wf.CacheDir(), cacheKey)
-	cacheInfo, err := os.Stat(cachePath)
-	if err != nil {
-		return true
-	}
+const lastSyncDBTimeKey = "last_sync_db_time.json"
 
+// dbModTime returns the mtime of the 1Password app's database, which changes
+// whenever the vault data does.
+func dbModTime() (time.Time, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return true
+		return time.Time{}, err
 	}
-
-	sqlitePath := filepath.Join(home, "Library/Group Containers/2BUA8C4S2C.com.1password/Library/Application Support/1Password/Data/1password.sqlite")
-	dbInfo, err := os.Stat(sqlitePath)
+	fi, err := os.Stat(filepath.Join(home, "Library/Group Containers/2BUA8C4S2C.com.1password/Library/Application Support/1Password/Data/1password.sqlite"))
 	if err != nil {
-		// Fallback to time-based check if SQLite database is not accessible
-		return time.Since(cacheInfo.ModTime()) > 120*time.Minute
+		return time.Time{}, err
 	}
-
-	var lastSyncDbTime int64
-	lastSyncDbTimeKey := "last_sync_db_time.json"
-	if wf.Cache.Exists(lastSyncDbTimeKey) {
-		if err := wf.Cache.LoadJSON(lastSyncDbTimeKey, &lastSyncDbTime); err == nil {
-			return dbInfo.ModTime().UnixNano() > lastSyncDbTime
-		}
-	}
-
-	return dbInfo.ModTime().After(cacheInfo.ModTime())
+	return fi.ModTime(), nil
 }
 
+// IsCacheStale reports whether 1Password has changed since the cache was
+// written. Without access to the database it falls back to a 2 hour age.
+func IsCacheStale(wf *aw.Workflow, cacheKey string) bool {
+	cacheInfo, err := os.Stat(filepath.Join(wf.CacheDir(), cacheKey))
+	if err != nil {
+		return true
+	}
+	dbTime, err := dbModTime()
+	if err != nil {
+		return time.Since(cacheInfo.ModTime()) > 120*time.Minute
+	}
+	var lastSync int64
+	if err := wf.Cache.LoadJSON(lastSyncDBTimeKey, &lastSync); err == nil {
+		return dbTime.UnixNano() > lastSync
+	}
+	return dbTime.After(cacheInfo.ModTime())
+}
+
+// SaveLastSyncDbTime records the database mtime the cache was synced at.
 func SaveLastSyncDbTime(wf *aw.Workflow) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return
+	if t, err := dbModTime(); err == nil {
+		_ = wf.Cache.StoreJSON(lastSyncDBTimeKey, t.UnixNano()) // best effort: staleness falls back to the cache mtime
 	}
-
-	sqlitePath := filepath.Join(home, "Library/Group Containers/2BUA8C4S2C.com.1password/Library/Application Support/1Password/Data/1password.sqlite")
-	dbInfo, err := os.Stat(sqlitePath)
-	if err != nil {
-		return
-	}
-
-	_ = wf.Cache.StoreJSON("last_sync_db_time.json", dbInfo.ModTime().UnixNano())
 }
 
 // ParseVaults parses a slice of vault strings (which may be comma-separated)
@@ -102,14 +98,4 @@ func MatchesVault(vaultName, vaultID string, targetVaults []string) bool {
 		}
 	}
 	return false
-}
-
-func HasAll(input string, words []string) bool {
-	for _, w := range words {
-		if strings.Contains(input, w) {
-			continue
-		}
-		return false
-	}
-	return true
 }

@@ -97,10 +97,7 @@ func uiDetails(itemID string) alfredui.Actions {
 	if itemID == "" {
 		return fail(errors.New("no item selected"))
 	}
-	svc, err := onepassword.NewService("op")
-	if err != nil {
-		return fail(err)
-	}
+	svc := onepassword.NewService()
 	item, err := svc.GetItem(itemID)
 	if err != nil {
 		return fail(err)

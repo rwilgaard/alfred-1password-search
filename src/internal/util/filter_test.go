@@ -64,13 +64,18 @@ func TestFilterAndRankItems(t *testing.T) {
 		}
 	})
 
-	t.Run("id match ranks above url-only match", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "id-special-aws", true, nil)
-		if len(res) == 0 {
-			t.Fatal("expected match, got 0")
+	t.Run("exact id finds the item", func(t *testing.T) {
+		res := util.FilterAndRankItems(items, "ID-SPECIAL-AWS", true, nil)
+		if len(res) != 1 || res[0].Title != "Some Cloud Service" {
+			t.Fatalf("got %+v, want only 'Some Cloud Service'", res)
 		}
-		if res[0].Title != "Some Cloud Service" {
-			t.Errorf("expected 'Some Cloud Service', got %q", res[0].Title)
+	})
+
+	t.Run("partial id does not match", func(t *testing.T) {
+		// IDs are random strings, so partial and fuzzy hits on them are noise.
+		res := util.FilterAndRankItems(items, "special", true, nil)
+		if len(res) != 0 {
+			t.Fatalf("got %d matches, want 0", len(res))
 		}
 	})
 
@@ -129,17 +134,15 @@ func TestFilterAndRankItems(t *testing.T) {
 	})
 
 	t.Run("non-fuzzy search matches substrings with field ranking", func(t *testing.T) {
-		res := util.FilterAndRankItems(items, "aws", false, nil)
-		if len(res) < 2 {
-			t.Fatalf("expected at least 2 matches for 'aws', got %d", len(res))
+		res := util.FilterAndRankItems(items, "github", false, nil)
+		want := []string{"GitHub", "GitHub Enterprise", "Developer Resources"}
+		if len(res) != len(want) {
+			t.Fatalf("expected %d matches for 'github', got %d", len(want), len(res))
 		}
-		// "AWS Management Console" has 'aws' in title -> ranks first
-		if res[0].Title != "AWS Management Console" {
-			t.Errorf("expected res[0] to be 'AWS Management Console', got %q", res[0].Title)
-		}
-		// "Some Cloud Service" has 'aws' in ID -> ranks second
-		if res[1].Title != "Some Cloud Service" {
-			t.Errorf("expected res[1] to be 'Some Cloud Service', got %q", res[1].Title)
+		for i, title := range want {
+			if res[i].Title != title {
+				t.Errorf("res[%d] = %q, want %q", i, res[i].Title, title)
+			}
 		}
 	})
 }
