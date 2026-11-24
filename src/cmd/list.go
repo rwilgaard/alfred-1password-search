@@ -5,10 +5,9 @@ import (
 	"strings"
 	"time"
 
-	aw "github.com/deanishe/awgo"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
-	"github.com/rwilgaard/go-alfredutils/alfredutils"
+	"github.com/rwilgaard/go-alfredutils/v2/alfred"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +40,7 @@ var (
 						Subtitle("Please configure Selected Vaults in workflow configuration").
 						Icon(util.IconFolder).
 						Valid(false)
-					alfredutils.HandleFeedback(wf)
+					wf.Send()
 					return
 				}
 			} else if vaultFlag != "" {
@@ -68,7 +67,7 @@ var (
 			showSync := query == "" || strings.Contains("update items sync", strings.ToLower(query))
 			switch checkSync() {
 			case syncRunning:
-				wf.Rerun(0.5) // pick up the new items when the sync is done
+				wf.Rerun(500 * time.Millisecond) // pick up the new items when the sync is done
 				if showSync {
 					wf.NewItem("Updating items…").
 						Subtitle("Showing cached items until the update finishes").
@@ -90,15 +89,15 @@ var (
 				addRecentItem(items, id)
 			}
 			for _, item := range items {
-				addListItem(item, query)
+				addListItem(item, item.Title, query)
 			}
 
-			alfredutils.HandleFeedback(wf)
+			wf.Send()
 		},
 	}
 )
 
-func addListItem(item onepassword.Item, query string) *aw.Item {
+func addListItem(item onepassword.Item, title, query string) *alfred.Item {
 	subtitle := item.VaultName
 	if item.Category != "" {
 		subtitle += "  •  " + item.Category
@@ -108,7 +107,7 @@ func addListItem(item onepassword.Item, query string) *aw.Item {
 	}
 
 	// No UID: results are ranked here (match + frecency), so Alfred's knowledge must not reorder them.
-	it := wf.NewItem(item.Title).
+	it := wf.NewItem(title).
 		Subtitle(subtitle).
 		Var("item_id", item.ID).
 		Var("item_name", item.Title).
@@ -121,12 +120,13 @@ func addListItem(item onepassword.Item, query string) *aw.Item {
 		Valid(true)
 
 	for _, m := range []struct {
-		key, action string
+		key    alfred.Mod
+		action string
 	}{
-		{aw.ModCmd, cfg.ModifierCmd},
-		{aw.ModOpt, cfg.ModifierOpt},
-		{aw.ModCtrl, cfg.ModifierCtrl},
-		{aw.ModShift, cfg.ModifierShift},
+		{alfred.ModCmd, cfg.ModifierCmd},
+		{alfred.ModOpt, cfg.ModifierOpt},
+		{alfred.ModCtrl, cfg.ModifierCtrl},
+		{alfred.ModShift, cfg.ModifierShift},
 	} {
 		if m.action != "" {
 			it.NewModifier(m.key).
@@ -142,8 +142,7 @@ func addListItem(item onepassword.Item, query string) *aw.Item {
 func addRecentItem(items []onepassword.Item, id string) {
 	for _, item := range items {
 		if item.ID == id {
-			addListItem(item, "").
-				Title("↺ "+item.Title).
+			addListItem(item, "↺ "+item.Title, "").
 				Subtitle("Recently used  •  ⏎ to show details").
 				Var("action", actionShowDetails).
 				Arg(actionShowDetails)

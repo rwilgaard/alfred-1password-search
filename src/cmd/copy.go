@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/rwilgaard/alfred-1password-search/src/internal/clipboard"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
@@ -63,13 +62,11 @@ func copySecret(value, label string) (string, error) {
 	return "Copied " + label, nil
 }
 
-// reportError shows err through the workflow's "error" trigger. Run Script
-// and background commands can't use wf.FatalError: nothing reads their output.
+// reportError shows err through the workflow's "error" trigger and returns
+// nil. Run Script and background commands can't use wf.FatalError: nothing
+// reads their output.
 func reportError(err error) error {
-	if terr := wf.Alfred.RunTrigger("error", err.Error()); terr != nil {
-		log.Printf("Alfred error trigger failed: %v", terr)
-		return err
-	}
+	wf.ReportError(err)
 	return nil
 }
 

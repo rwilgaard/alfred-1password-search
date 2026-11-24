@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/alfred-1password-search/src/internal/util"
-	"github.com/rwilgaard/go-alfredutils/alfredutils"
 	"github.com/spf13/cobra"
 )
 
@@ -33,10 +32,8 @@ var vaultsCmd = &cobra.Command{
 				Valid(true)
 		}
 
-		if args[0] != "" {
-			wf.Filter(args[0])
-		}
-		alfredutils.HandleFeedback(wf)
+		wf.Filter(args[0])
+		wf.Send()
 	},
 }
 
