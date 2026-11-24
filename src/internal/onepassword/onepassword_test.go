@@ -19,6 +19,23 @@ func mockFail() func(string, ...string) *exec.Cmd {
 	}
 }
 
+func TestAuthorization(t *testing.T) {
+	ok := &onepassword.Service{BinPath: "op", ExecCommand: mockOK(`{}`)}
+	if !ok.IsAuthorized() {
+		t.Error("IsAuthorized() = false on success")
+	}
+	if err := ok.Authorize(); err != nil {
+		t.Errorf("Authorize() = %v", err)
+	}
+	fail := &onepassword.Service{BinPath: "op", ExecCommand: mockFail()}
+	if fail.IsAuthorized() {
+		t.Error("IsAuthorized() = true on failure")
+	}
+	if err := fail.Authorize(); err == nil {
+		t.Error("Authorize() = nil on failure")
+	}
+}
+
 func TestListItems(t *testing.T) {
 	const mockJSON = `[{"id":"abc123","title":"Gmail","category":"LOGIN","vault":{"id":"vlt1","name":"Personal"},"additional_information":"user@gmail.com","urls":[{"href":"https://gmail.com","primary":true}]}]`
 

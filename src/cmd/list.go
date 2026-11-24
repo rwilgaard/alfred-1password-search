@@ -63,14 +63,28 @@ var (
 			usage := loadUsage()
 			items = util.FilterAndRankItems(items, query, cfg.FuzzySearch, usage.Scores(time.Now()))
 
-			if (query == "" || strings.Contains("update items sync", strings.ToLower(query))) && util.IsCacheStale(wf, itemsCacheKey) {
-				wf.NewItem("Update items").
-					Subtitle("1Password vault has changed. Press ⏎ to update.").
-					Icon(util.IconUpdate).
-					Var("action", actionSync).
-					Var("list_query", query).
-					Arg(actionSync).
-					Valid(true)
+			// Sync status only shows on an empty query, or one asking for it, so
+			// it doesn't push matches down while typing.
+			showSync := query == "" || strings.Contains("update items sync", strings.ToLower(query))
+			switch checkSync() {
+			case syncRunning:
+				wf.Rerun(0.5) // pick up the new items when the sync is done
+				if showSync {
+					wf.NewItem("Updating items…").
+						Subtitle("Showing cached items until the update finishes").
+						Icon(util.IconUpdate).
+						Valid(false)
+				}
+			case syncLocked:
+				if showSync {
+					wf.NewItem("Update items").
+						Subtitle("1Password is locked. Press ⏎ to unlock and update.").
+						Icon(util.IconUpdate).
+						Var("action", actionSync).
+						Var("list_query", query).
+						Arg(actionSync).
+						Valid(true)
+				}
 			}
 			if id, ok := recentID(usage); ok && query == "" {
 				addRecentItem(items, id)

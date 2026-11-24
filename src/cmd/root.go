@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"time"
 
 	aw "github.com/deanishe/awgo"
 	"github.com/deanishe/awgo/update"
@@ -31,7 +30,6 @@ const repo = "rwilgaard/alfred-1password-search"
 const (
 	itemsCacheKey = "items.json"
 	syncJobName   = "sync"
-	cacheMaxAge   = 120 * time.Minute
 )
 
 var (

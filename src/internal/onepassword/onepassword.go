@@ -124,6 +124,20 @@ func NewService() *Service {
 	return &Service{BinPath: "op", ExecCommand: exec.Command}
 }
 
+// IsAuthorized reports whether the CLI has an active session. Unlike other
+// commands, op whoami fails instead of prompting for Touch ID.
+func (s *Service) IsAuthorized() bool {
+	return s.ExecCommand(s.BinPath, "whoami").Run() == nil
+}
+
+// Authorize prompts for 1Password's unlock (Touch ID or password) if needed.
+func (s *Service) Authorize() error {
+	if err := s.ExecCommand(s.BinPath, "user", "get", "--me").Run(); err != nil {
+		return fmt.Errorf("unlock 1Password: %w", err)
+	}
+	return nil
+}
+
 // ListItems returns every item the CLI can see, without secrets.
 func (s *Service) ListItems() ([]Item, error) {
 	out, err := s.ExecCommand(s.BinPath, "item", "list", "--format", "json").Output()

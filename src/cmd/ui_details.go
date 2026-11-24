@@ -22,6 +22,7 @@ const (
 	envCopyKey    = "copy_key"
 	envCopyValue  = "copy_value"
 	envCopyLabel  = "copy_label"
+	envReopened   = "reopened" // set by the show_details trigger
 )
 
 // Component ids in workflow/details.alfredui/ui.json.
@@ -44,6 +45,11 @@ const (
 	uiScript          = "../scripts/run.sh"
 	accountIDCacheKey = "account_id.json"
 	totpWarnSeconds   = 5
+	// showDetailsTrigger is the external trigger that opens the details window.
+	showDetailsTrigger = "show_details"
+	// unlockPromptThreshold separates a normal op item get from one that
+	// waited on 1Password's unlock prompt.
+	unlockPromptThreshold = 1500 * time.Millisecond
 )
 
 // The ui-* commands are run by Alfred UI script actions. Their stdout must be
@@ -98,9 +104,20 @@ func uiDetails(itemID string) alfredui.Actions {
 		return fail(errors.New("no item selected"))
 	}
 	svc := onepassword.NewService()
+	start := time.Now()
 	item, err := svc.GetItem(itemID)
 	if err != nil {
 		return fail(err)
+	}
+	// A slow fetch means 1Password asked to unlock. The prompt took focus,
+	// which closed Alfred and this window, so open the window again. The
+	// reopened window never does this, so it can't loop.
+	if time.Since(start) > unlockPromptThreshold && os.Getenv(envReopened) == "" {
+		if err := wf.Alfred.RunTrigger(showDetailsTrigger, itemID); err != nil {
+			log.Printf("[ui] reopen details: %v", err)
+		} else {
+			return alfredui.Actions{}
+		}
 	}
 	recordUse(item.ID)
 
