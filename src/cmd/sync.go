@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var reopenFlag bool
+
 var syncCmd = &cobra.Command{
 	Use:          "sync",
 	Short:        "Sync items and vaults from 1Password",
@@ -16,13 +18,15 @@ var syncCmd = &cobra.Command{
 	RunE: func(_ *cobra.Command, _ []string) error {
 		log.Println("Syncing 1Password items...")
 		if err := syncCache(); err != nil {
-			msg := fmt.Sprintf("Sync failed: %s", err)
-			if zerr := wf.Alfred.RunTrigger("error", msg); zerr != nil {
-				log.Printf("Alfred error trigger failed: %v", zerr)
-			}
-			return err
+			return reportError(fmt.Errorf("sync failed: %w", err))
 		}
 		log.Println("Sync complete!")
+		if reopenFlag {
+			// Show the refreshed list with the previous query restored.
+			if err := wf.Alfred.RunTrigger("list_items", cfg.ListQuery); err != nil {
+				log.Printf("reopen list: %v", err)
+			}
+		}
 		return nil
 	},
 }
@@ -56,5 +60,6 @@ func syncCache() error {
 }
 
 func init() {
+	syncCmd.Flags().BoolVar(&reopenFlag, "reopen", false, "reopen the item list after syncing")
 	rootCmd.AddCommand(syncCmd)
 }

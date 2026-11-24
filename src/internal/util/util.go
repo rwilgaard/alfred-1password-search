@@ -2,7 +2,6 @@
 package util
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,20 +11,7 @@ import (
 	"github.com/sethvargo/go-password/password"
 )
 
-var (
-	IconBack   = &aw.Icon{Value: "icons/go_back.png"}
-	IconEdit   = &aw.Icon{Value: "icons/edit.png"}
-	IconDelete = &aw.Icon{Value: "icons/trash.png"}
-	IconFolder = &aw.Icon{Value: "icons/vault.png"}
-)
-
-func GetIcon(key string) *aw.Icon {
-	iconPath := fmt.Sprintf("icons/%s.png", strings.ToLower(key))
-	if _, err := os.Stat(iconPath); err == nil {
-		return &aw.Icon{Value: iconPath}
-	}
-	return &aw.Icon{Value: "icons/default.png"}
-}
+var IconFolder = &aw.Icon{Value: "icons/vault.png"}
 
 func GeneratePassword(length int, symbols bool, allowedSymbols string) (string, error) {
 	input := password.GeneratorInput{Symbols: allowedSymbols}

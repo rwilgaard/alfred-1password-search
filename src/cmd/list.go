@@ -10,6 +10,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// action values routed on by the conditional after the list Script Filters.
+const (
+	actionShowDetails = "Show Details"
+	actionSync        = "Sync"
+)
+
 var (
 	vaultFlag  string
 	vaultsFlag []string
@@ -74,58 +80,11 @@ var (
 			if updateAvailable {
 				wf.Configure(aw.SuppressUIDs(true))
 			}
-
+			if query == "" {
+				addRecentItem(items)
+			}
 			for _, item := range items {
-				subtitle := item.VaultName
-				if item.Category != "" {
-					subtitle += "  •  " + item.Category
-				}
-
-				if item.PrimaryURL != "" {
-					subtitle += "  •  " + item.PrimaryURL
-				}
-
-				it := wf.NewItem(item.Title).
-					Subtitle(subtitle).
-					UID(item.ID).
-					Var("item_id", item.ID).
-					Var("item_name", item.Title).
-					Var("item_url", item.PrimaryURL).
-					Var("vault_id", item.VaultID).
-					Var("vault_name", item.VaultName).
-					Var("list_query", query).
-					Var("action", cfg.ModifierReturn).
-					Arg(cfg.ModifierReturn).
-					Valid(true)
-
-				if cfg.ModifierCmd != "" {
-					it.NewModifier(aw.ModCmd).
-						Subtitle(cfg.ModifierCmd).
-						Var("action", cfg.ModifierCmd).
-						Arg(cfg.ModifierCmd).
-						Valid(true)
-				}
-				if cfg.ModifierOpt != "" {
-					it.NewModifier(aw.ModOpt).
-						Subtitle(cfg.ModifierOpt).
-						Var("action", cfg.ModifierOpt).
-						Arg(cfg.ModifierOpt).
-						Valid(true)
-				}
-				if cfg.ModifierCtrl != "" {
-					it.NewModifier(aw.ModCtrl).
-						Subtitle(cfg.ModifierCtrl).
-						Var("action", cfg.ModifierCtrl).
-						Arg(cfg.ModifierCtrl).
-						Valid(true)
-				}
-				if cfg.ModifierShift != "" {
-					it.NewModifier(aw.ModShift).
-						Subtitle(cfg.ModifierShift).
-						Var("action", cfg.ModifierShift).
-						Arg(cfg.ModifierShift).
-						Valid(true)
-				}
+				addListItem(item, query)
 			}
 
 			if updateAvailable {
@@ -133,10 +92,9 @@ var (
 					Subtitle("1Password vault has changed. Press ⏎ to update.").
 					Icon(util.IconFolder).
 					Match("Update items sync").
-					Var("item_id", "sync").
-					Var("action", "Show Details").
+					Var("action", actionSync).
 					Var("list_query", query).
-					Arg("sync").
+					Arg(actionSync).
 					Valid(true)
 
 				items := wf.Feedback.Items
@@ -151,6 +109,69 @@ var (
 		},
 	}
 )
+
+func addListItem(item onepassword.Item, query string) *aw.Item {
+	subtitle := item.VaultName
+	if item.Category != "" {
+		subtitle += "  •  " + item.Category
+	}
+	if item.PrimaryURL != "" {
+		subtitle += "  •  " + item.PrimaryURL
+	}
+
+	it := wf.NewItem(item.Title).
+		Subtitle(subtitle).
+		UID(item.ID).
+		Var("item_id", item.ID).
+		Var("item_name", item.Title).
+		Var("item_url", item.PrimaryURL).
+		Var("vault_id", item.VaultID).
+		Var("vault_name", item.VaultName).
+		Var("list_query", query).
+		Var("action", cfg.ModifierReturn).
+		Arg(cfg.ModifierReturn).
+		Valid(true)
+
+	for _, m := range []struct {
+		key, action string
+	}{
+		{aw.ModCmd, cfg.ModifierCmd},
+		{aw.ModOpt, cfg.ModifierOpt},
+		{aw.ModCtrl, cfg.ModifierCtrl},
+		{aw.ModShift, cfg.ModifierShift},
+	} {
+		if m.action != "" {
+			it.NewModifier(m.key).
+				Subtitle(m.action).
+				Var("action", m.action).
+				Arg(m.action).
+				Valid(true)
+		}
+	}
+	return it
+}
+
+// addRecentItem puts the recently used item first, with ⏎ opening its
+// details. Alfred orders results by what it has learned for each UID, which
+// would push it down, so this list is sent without UIDs. Typed searches keep
+// them, so learned ranking still applies there.
+func addRecentItem(items []onepassword.Item) {
+	r, ok := loadRecent()
+	if !ok {
+		return
+	}
+	for _, item := range items {
+		if item.ID == r.ID {
+			wf.Configure(aw.SuppressUIDs(true)) // before any item is created
+			addListItem(item, "").
+				Title("↺ "+item.Title).
+				Subtitle("Recently used  •  ⏎ to show details").
+				Var("action", actionShowDetails).
+				Arg(actionShowDetails)
+			return
+		}
+	}
+}
 
 func init() {
 	listCmd.Flags().StringVarP(&vaultFlag, "vault", "v", "", "filter by vault name (overrides vault_name env var)")

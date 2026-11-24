@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"os"
 	"time"
 
 	aw "github.com/deanishe/awgo"
 	"github.com/deanishe/awgo/update"
-	"github.com/rwilgaard/alfred-1password-search/src/internal/onepassword"
 	"github.com/rwilgaard/go-alfredutils/alfredutils"
 	"github.com/spf13/cobra"
 	"go.deanishe.net/fuzzy"
@@ -24,6 +24,7 @@ type workflowConfig struct {
 	SelectedVaults        string `env:"selected_vaults"`
 	SelectedVaultsKeyword string `env:"selected_vaults_keyword"`
 	ListQuery             string `env:"list_query"`
+	ItemID                string `env:"item_id"`
 }
 
 const repo = "rwilgaard/alfred-1password-search"
@@ -67,15 +68,6 @@ func run() {
 	}
 }
 
-func setupService() *onepassword.Service {
-	svc, err := onepassword.NewService("op")
-	if err != nil {
-		wf.FatalError(err)
-		return nil
-	}
-	return svc
-}
-
 func init() {
 	sopts := []fuzzy.Option{
 		fuzzy.AdjacencyBonus(10.0),
@@ -83,10 +75,14 @@ func init() {
 		fuzzy.MaxLeadingLetterPenalty(-3.0),
 		fuzzy.UnmatchedLetterPenalty(-0.5),
 	}
-	wf = aw.New(
+	opts := []aw.Option{
 		aw.SortOptions(sopts...),
 		aw.MaxResults(25),
-		update.GitHub(repo),
 		aw.SuppressUIDs(true),
-	)
+	}
+	// Alfred UI scripts get no alfred_workflow_version, and the updater panics without it.
+	if os.Getenv("alfred_workflow_version") != "" {
+		opts = append(opts, update.GitHub(repo))
+	}
+	wf = aw.New(opts...)
 }

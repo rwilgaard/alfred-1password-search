@@ -1,0 +1,585 @@
+{
+  "variablesconfig": {
+    "item_id": {
+      "src": "variable",
+      "scriptenv": true
+    },
+    "item_name": {
+      "src": "variable",
+      "default": " "
+    },
+    "item_url": {
+      "default": ""
+    },
+    "revealed": {
+      "default": " "
+    },
+    "totp_secret": {
+      "scriptenv": true
+    },
+    "notes": {
+      "scriptenv": true
+    },
+    "copy_key": {
+      "scriptenv": true
+    },
+    "copy_value": {
+      "scriptenv": true
+    },
+    "copy_label": {
+      "scriptenv": true
+    },
+    "op_url": {
+      "default": ""
+    }
+  },
+  "pulse": {
+    "src": "../scripts/run.sh",
+    "args": "ui-totp",
+    "interval": 0,
+    "intervalmode": "regular"
+  },
+  "window": {
+    "title": "1Password",
+    "padding": 16,
+    "size": {
+      "width": 600,
+      "height": 500
+    },
+    "root": {
+      "type": "view",
+      "layout": "border",
+      "spacing": 10,
+      "shortcuts": [
+        {
+          "shortcut": "↑",
+          "action": {
+            "type": "function",
+            "src": "fields",
+            "args": "selectup"
+          }
+        },
+        {
+          "shortcut": "↓",
+          "action": {
+            "type": "function",
+            "src": "fields",
+            "args": "selectdown"
+          }
+        },
+        {
+          "shortcut": "⌘C",
+          "action": {
+            "type": "script",
+            "src": "../scripts/run.sh",
+            "args": [
+              "ui-copy",
+              "stay"
+            ],
+            "async": true,
+            "variables": {
+              "copy_key": "{value:fields.selected.key.text}",
+              "copy_value": "{value:fields.selected.raw.text}",
+              "copy_label": "{value:fields.selected.name.text}"
+            }
+          }
+        },
+        {
+          "shortcut": "⌘R",
+          "action": {
+            "type": "json",
+            "variables": {
+              "revealed": "{value:fields.selected.raw.text}"
+            },
+            "src": {
+              "update": {
+                "ids": {
+                  "reveal": {
+                    "text": "{var:revealed}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "shortcut": "⌘P",
+          "action": {
+            "type": "json",
+            "src": {
+              "open": {
+                "type": "url",
+                "src": "{var:op_url}"
+              },
+              "finish": {}
+            }
+          }
+        },
+        {
+          "shortcut": "⌘T",
+          "action": {
+            "type": "script",
+            "src": "../scripts/run.sh",
+            "args": [
+              "ui-copy",
+              "close"
+            ],
+            "async": true,
+            "variables": {
+              "copy_key": "otp",
+              "copy_value": "",
+              "copy_label": "one-time password"
+            }
+          }
+        },
+        {
+          "shortcut": "⌘O",
+          "action": {
+            "type": "json",
+            "src": {
+              "open": {
+                "type": "url",
+                "src": "{var:item_url}"
+              },
+              "finish": {}
+            }
+          }
+        },
+        {
+          "shortcut": "⌘N",
+          "action": {
+            "type": "script",
+            "src": "../scripts/run.sh",
+            "args": [
+              "ui-notes"
+            ],
+            "async": true
+          }
+        }
+      ],
+      "events": [
+        {
+          "triggers": "launched",
+          "action": {
+            "type": "script",
+            "src": "../scripts/run.sh",
+            "args": [
+              "ui-details"
+            ],
+            "async": true
+          }
+        }
+      ],
+      "components": [
+        {
+          "constraints": {
+            "region": "top"
+          },
+          "type": "view",
+          "layout": "inline",
+          "direction": "vertical",
+          "spacing": 10,
+          "components": [
+            {
+              "type": "view",
+              "layout": "border",
+              "spacing": 12,
+              "components": [
+                {
+                  "constraints": {
+                    "region": "centre"
+                  },
+                  "type": "view",
+                  "layout": "inline",
+                  "direction": "vertical",
+                  "spacing": 2,
+                  "components": [
+                    {
+                      "id": "title",
+                      "type": "label",
+                      "text": "{var:item_name}",
+                      "font": {
+                        "size": "large",
+                        "weight": "bold"
+                      }
+                    },
+                    {
+                      "id": "subtitle",
+                      "type": "label",
+                      "text": " ",
+                      "colour": "secondaryLabelColor"
+                    }
+                  ]
+                },
+                {
+                  "constraints": {
+                    "region": "right"
+                  },
+                  "id": "totpbox",
+                  "type": "view",
+                  "layout": "inline",
+                  "direction": "horizontal",
+                  "spacing": 8,
+                  "hidden": true,
+                  "components": [
+                    {
+                      "id": "totpcode",
+                      "type": "label",
+                      "text": " ",
+                      "font": {
+                        "size": "large",
+                        "weight": "semibold"
+                      }
+                    },
+                    {
+                      "id": "totpbar",
+                      "type": "progress",
+                      "style": "round",
+                      "thickness": 3,
+                      "progress": 1
+                    },
+                    {
+                      "type": "button",
+                      "text": "Copy  ⌘T",
+                      "events": [
+                        {
+                          "triggers": "actioned",
+                          "action": {
+                            "type": "script",
+                            "src": "../scripts/run.sh",
+                            "args": [
+                              "ui-copy",
+                              "close"
+                            ],
+                            "async": true,
+                            "variables": {
+                              "copy_key": "otp",
+                              "copy_value": "",
+                              "copy_label": "one-time password"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "filter",
+              "type": "textfield",
+              "placeholder": "Filter fields  (↑↓ select, ↩ copy, Esc back)",
+              "focus": true,
+              "events": [
+                {
+                  "triggers": "changed",
+                  "action": {
+                    "type": "function",
+                    "src": "fields",
+                    "args": "filterdata"
+                  }
+                },
+                {
+                  "triggers": "actioned",
+                  "action": {
+                    "type": "script",
+                    "src": "../scripts/run.sh",
+                    "args": [
+                      "ui-copy",
+                      "close"
+                    ],
+                    "async": true,
+                    "variables": {
+                      "copy_key": "{value:fields.selected.key.text}",
+                      "copy_value": "{value:fields.selected.raw.text}",
+                      "copy_label": "{value:fields.selected.name.text}"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "constraints": {
+            "region": "centre"
+          },
+          "type": "view",
+          "layout": "stack",
+          "components": [
+            {
+              "id": "fields",
+              "type": "dataview",
+              "cell": {
+                "height": 46,
+                "init": {
+                  "cell.background": null
+                },
+                "selected": {
+                  "cell.background": "alfredSelectedResultBackgroundColor"
+                },
+                "root": {
+                  "id": "cell",
+                  "type": "view",
+                  "layout": "stack",
+                  "cornerradius": 6,
+                  "components": [
+                    {
+                      "id": "raw",
+                      "type": "label",
+                      "hidden": true
+                    },
+                    {
+                      "id": "key",
+                      "type": "label",
+                      "hidden": true
+                    },
+                    {
+                      "type": "view",
+                      "layout": "inline",
+                      "direction": "vertical",
+                      "spacing": 1,
+                      "padding": 7,
+                      "components": [
+                        {
+                          "id": "name",
+                          "type": "label",
+                          "font": {
+                            "size": "small"
+                          },
+                          "colour": "secondaryLabelColor"
+                        },
+                        {
+                          "id": "value",
+                          "type": "label",
+                          "linebreak": "truncatemiddle"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "data": {
+                "type": "basic",
+                "src": []
+              },
+              "events": [
+                {
+                  "triggers": "doubleclicked",
+                  "action": {
+                    "type": "script",
+                    "src": "../scripts/run.sh",
+                    "args": [
+                      "ui-copy",
+                      "close"
+                    ],
+                    "async": true,
+                    "variables": {
+                      "copy_key": "{value:fields.selected.key.text}",
+                      "copy_value": "{value:fields.selected.raw.text}",
+                      "copy_label": "{value:fields.selected.name.text}"
+                    }
+                  }
+                },
+                {
+                  "triggers": "changed",
+                  "action": {
+                    "type": "json",
+                    "src": {
+                      "update": {
+                        "ids": {
+                          "reveal": {
+                            "text": " "
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "spacing": 2
+            },
+            {
+              "constraints": {
+                "position": "centre"
+              },
+              "id": "loading",
+              "type": "label",
+              "text": "Loading…",
+              "textalign": "centre",
+              "font": {
+                "size": "extralarge",
+                "weight": "medium"
+              },
+              "colour": "secondaryLabelColor"
+            }
+          ]
+        },
+        {
+          "constraints": {
+            "region": "bottom"
+          },
+          "type": "view",
+          "layout": "inline",
+          "direction": "vertical",
+          "spacing": 8,
+          "components": [
+            {
+              "id": "reveal",
+              "type": "label",
+              "text": " ",
+              "font": {
+                "weight": "medium"
+              }
+            },
+            {
+              "type": "view",
+              "layout": "inline",
+              "direction": "horizontal",
+              "spacing": 8,
+              "components": [
+                {
+                  "type": "button",
+                  "text": "Copy & Close  ↩",
+                  "events": [
+                    {
+                      "triggers": "actioned",
+                      "action": {
+                        "type": "script",
+                        "src": "../scripts/run.sh",
+                        "args": [
+                          "ui-copy",
+                          "close"
+                        ],
+                        "async": true,
+                        "variables": {
+                          "copy_key": "{value:fields.selected.key.text}",
+                          "copy_value": "{value:fields.selected.raw.text}",
+                          "copy_label": "{value:fields.selected.name.text}"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "button",
+                  "text": "Copy  ⌘C",
+                  "events": [
+                    {
+                      "triggers": "actioned",
+                      "action": {
+                        "type": "script",
+                        "src": "../scripts/run.sh",
+                        "args": [
+                          "ui-copy",
+                          "stay"
+                        ],
+                        "async": true,
+                        "variables": {
+                          "copy_key": "{value:fields.selected.key.text}",
+                          "copy_value": "{value:fields.selected.raw.text}",
+                          "copy_label": "{value:fields.selected.name.text}"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "button",
+                  "text": "Reveal  ⌘R",
+                  "events": [
+                    {
+                      "triggers": "actioned",
+                      "action": {
+                        "type": "json",
+                        "variables": {
+                          "revealed": "{value:fields.selected.raw.text}"
+                        },
+                        "src": {
+                          "update": {
+                            "ids": {
+                              "reveal": {
+                                "text": "{var:revealed}"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "button",
+                  "text": "Open URL  ⌘O",
+                  "events": [
+                    {
+                      "triggers": "actioned",
+                      "action": {
+                        "type": "json",
+                        "src": {
+                          "open": {
+                            "type": "url",
+                            "src": "{var:item_url}"
+                          },
+                          "finish": {}
+                        }
+                      }
+                    }
+                  ],
+                  "id": "openurl",
+                  "enabled": false
+                },
+                {
+                  "id": "open1p",
+                  "type": "button",
+                  "text": "1Password  ⌘P",
+                  "enabled": false,
+                  "events": [
+                    {
+                      "triggers": "actioned",
+                      "action": {
+                        "type": "json",
+                        "src": {
+                          "open": {
+                            "type": "url",
+                            "src": "{var:op_url}"
+                          },
+                          "finish": {}
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "button",
+                  "text": "Notes  ⌘N",
+                  "events": [
+                    {
+                      "triggers": "actioned",
+                      "action": {
+                        "type": "script",
+                        "src": "../scripts/run.sh",
+                        "args": [
+                          "ui-notes"
+                        ],
+                        "async": true
+                      }
+                    }
+                  ],
+                  "id": "notesbtn",
+                  "enabled": false
+                }
+              ]
+            },
+            {
+              "id": "status",
+              "type": "label",
+              "text": " ",
+              "colour": "secondaryLabelColor"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

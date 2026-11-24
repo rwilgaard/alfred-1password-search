@@ -38,6 +38,37 @@ type Field struct {
 	Type    string
 	Value   string
 	Purpose string
+	TOTP    string // current one-time code, only set on OTP fields
+}
+
+// Keys for the fields Lookup finds.
+const (
+	KeyPassword = "password"
+	KeyUsername = "username"
+	KeyOTP      = "otp"
+)
+
+// Lookup returns the item's password, username or OTP field. It matches on
+// purpose and type rather than label, since users can rename labels.
+func (d *ItemDetail) Lookup(key string) (Field, bool) {
+	for _, f := range d.Fields {
+		if (key == KeyPassword && f.Purpose == "PASSWORD") ||
+			(key == KeyUsername && f.Purpose == "USERNAME") ||
+			(key == KeyOTP && f.Type == "OTP") {
+			return f, true
+		}
+	}
+	return Field{}, false
+}
+
+// Notes returns the item's notes, or "" if it has none.
+func (d *ItemDetail) Notes() string {
+	for _, f := range d.Fields {
+		if f.Purpose == "NOTES" {
+			return f.Value
+		}
+	}
+	return ""
 }
 
 type Vault struct {
@@ -61,6 +92,7 @@ type opField struct {
 	Type    string `json:"type"`
 	Value   string `json:"value"`
 	Purpose string `json:"purpose"`
+	TOTP    string `json:"totp"`
 }
 
 type opItemList struct {

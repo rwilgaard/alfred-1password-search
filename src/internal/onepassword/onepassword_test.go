@@ -126,7 +126,7 @@ func TestListItems(t *testing.T) {
 }
 
 func TestGetItem(t *testing.T) {
-	const mockJSON = `{"id":"abc123","title":"Gmail","category":"LOGIN","vault":{"id":"vlt1","name":"Personal"},"fields":[{"id":"username","label":"username","type":"STRING","purpose":"USERNAME","value":"user@gmail.com"},{"id":"password","label":"password","type":"CONCEALED","purpose":"PASSWORD","value":"s3cret"},{"id":"notesPlain","label":"notesPlain","type":"STRING","purpose":"NOTES","value":"some notes"}],"urls":[{"href":"https://gmail.com","primary":true}]}`
+	const mockJSON = `{"id":"abc123","title":"Gmail","category":"LOGIN","vault":{"id":"vlt1","name":"Personal"},"fields":[{"id":"username","label":"username","type":"STRING","purpose":"USERNAME","value":"user@gmail.com"},{"id":"password","label":"password","type":"CONCEALED","purpose":"PASSWORD","value":"s3cret"},{"id":"notesPlain","label":"notesPlain","type":"STRING","purpose":"NOTES","value":"some notes"},{"id":"TOTP_x","label":"one-time password","type":"OTP","value":"otpauth://totp/x?secret=ABC","totp":"123456"}],"urls":[{"href":"https://gmail.com","primary":true}]}`
 
 	tests := []struct {
 		name    string
@@ -144,8 +144,11 @@ func TestGetItem(t *testing.T) {
 				if item.PrimaryURL != "https://gmail.com" {
 					t.Errorf("PrimaryURL = %q", item.PrimaryURL)
 				}
-				if len(item.Fields) != 3 {
-					t.Fatalf("got %d fields, want 3", len(item.Fields))
+				if len(item.Fields) != 4 {
+					t.Fatalf("got %d fields, want 4", len(item.Fields))
+				}
+				if item.Fields[3].TOTP != "123456" {
+					t.Errorf("OTP totp = %q, want 123456", item.Fields[3].TOTP)
 				}
 				if item.Fields[1].Type != "CONCEALED" {
 					t.Errorf("password type = %q, want CONCEALED", item.Fields[1].Type)
@@ -173,6 +176,39 @@ func TestGetItem(t *testing.T) {
 				tt.check(t, item)
 			}
 		})
+	}
+}
+
+func TestLookupAndNotes(t *testing.T) {
+	item := &onepassword.ItemDetail{Fields: []onepassword.Field{
+		{Label: "login", Purpose: "USERNAME", Value: "me"},
+		{Label: "renamed", Type: "CONCEALED", Purpose: "PASSWORD", Value: "s3cret"},
+		{Label: "one-time password", Type: "OTP", Value: "otpauth://x", TOTP: "123456"},
+		{Label: "notesPlain", Purpose: "NOTES", Value: "hi"},
+	}}
+
+	tests := []struct {
+		key, want string
+		found     bool
+	}{
+		{onepassword.KeyUsername, "me", true},
+		{onepassword.KeyPassword, "s3cret", true},
+		{onepassword.KeyOTP, "otpauth://x", true},
+		{"other", "", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.key, func(t *testing.T) {
+			f, ok := item.Lookup(tt.key)
+			if ok != tt.found || f.Value != tt.want {
+				t.Errorf("Lookup(%q) = %q, %v; want %q, %v", tt.key, f.Value, ok, tt.want, tt.found)
+			}
+		})
+	}
+	if got := item.Notes(); got != "hi" {
+		t.Errorf("Notes() = %q, want hi", got)
+	}
+	if got := (&onepassword.ItemDetail{}).Notes(); got != "" {
+		t.Errorf("Notes() on empty item = %q", got)
 	}
 }
 
