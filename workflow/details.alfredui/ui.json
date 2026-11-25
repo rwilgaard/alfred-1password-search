@@ -228,15 +228,22 @@
                   "hidden": true,
                   "components": [
                     {
+                      "constraints": {
+                        "position": "centre"
+                      },
                       "id": "totpcode",
                       "type": "label",
                       "text": " ",
                       "font": {
                         "size": "large",
-                        "weight": "semibold"
+                        "weight": "semibold",
+                        "monospaced": "digits"
                       }
                     },
                     {
+                      "constraints": {
+                        "position": "centre"
+                      },
                       "id": "totpbar",
                       "type": "progress",
                       "style": "round",
@@ -244,6 +251,9 @@
                       "progress": 1
                     },
                     {
+                      "constraints": {
+                        "position": "centre"
+                      },
                       "type": "button",
                       "text": "Copy  ⌘T",
                       "events": [

@@ -11,11 +11,11 @@ Search 1Password items from Alfred and copy passwords, usernames and one-time co
 
 1. Download the latest `.alfredworkflow` from [Releases](https://github.com/rwilgaard/alfred-1password-search/releases)
 2. Double-click to import into Alfred
-3. Trigger `op` — the first run fetches your items from 1Password (unlock with Touch ID if asked)
+3. Trigger `op`. The first run fetches your items from 1Password, so unlock with Touch ID if asked
 
 ## Usage
 
-### `op [query]` — search all vaults
+### `op [query]`: search all vaults
 
 Matches on title, URL, vault and category. Items you use often rank higher, and the last used item shows on top for five minutes.
 
@@ -32,15 +32,15 @@ Copied values are hidden from clipboard history and cleared after `clipboard_tim
 
 The item list is cached and updates in the background when 1Password changes. If 1Password is locked, an "Update items" row lets you unlock and update.
 
-### `ops [query]` — search selected vaults
+### `ops [query]`: search selected vaults
 
 Same as `op`, limited to the vaults in `selected_vaults`. The keyword is set with `selected_vaults_keyword`.
 
-### `opv [query]` — pick a vault
+### `opv [query]`: pick a vault
 
 Choose a vault, then search only that vault.
 
-### `opg` — generate a password
+### `opg`: generate a password
 
 Shows one password with symbols and one without, `pw_length` characters long. ⏎ copies it.
 
@@ -77,7 +77,7 @@ make dev            # build, install into Alfred in place, and reload
 make package-alfred # build + zip into .alfredworkflow
 make zip-alfred     # zip into .alfredworkflow without rebuilding (for CI/CD)
 make fmt            # format with gofumpt
-make release V=x.y.z        # bump version, package, and tag locally
+make release V=x.y.z # bump version, package, and tag locally
 ```
 
 Requires Go 1.27.4+ and `golangci-lint`.

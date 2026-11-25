@@ -151,6 +151,8 @@ func uiDetails(itemID string) alfredui.Actions {
 			a = a.Set(id, p)
 		}
 		a.Pulse = &alfredui.Pulse{Interval: 1}
+		// The code label was laid out as " " and keeps that width until a relayout.
+		a.Update.Relayout = true
 	}
 	return a
 }
