@@ -1180,199 +1180,199 @@
 		<key>16DEEC88-83FB-45FE-90CA-96DA3F257FCF</key>
 		<dict>
 			<key>xpos</key>
-			<real>30.0</real>
+			<real>30</real>
 			<key>ypos</key>
-			<real>180.0</real>
+			<real>180</real>
 		</dict>
 		<key>1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D</key>
 		<dict>
 			<key>xpos</key>
-			<real>175.0</real>
+			<real>175</real>
 			<key>ypos</key>
-			<real>180.0</real>
+			<real>180</real>
 		</dict>
 		<key>2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E</key>
 		<dict>
 			<key>xpos</key>
-			<real>400.0</real>
+			<real>400</real>
 			<key>ypos</key>
-			<real>155.0</real>
+			<real>155</real>
 		</dict>
 		<key>32A946DC-34C1-43C9-956B-60C68B50F746</key>
 		<dict>
 			<key>xpos</key>
-			<real>175.0</real>
+			<real>175</real>
 			<key>ypos</key>
-			<real>450.0</real>
+			<real>450</real>
 		</dict>
 		<key>451FD0F9-30EE-424B-B905-3FECF05F2B73</key>
 		<dict>
 			<key>xpos</key>
-			<real>960.0</real>
+			<real>960</real>
 			<key>ypos</key>
-			<real>345.0</real>
+			<real>345</real>
 		</dict>
 		<key>5E6F7A8B-9C0D-1E2F-3A4B-5C6D7E8F9A0B</key>
 		<dict>
 			<key>xpos</key>
-			<real>960.0</real>
+			<real>960</real>
 			<key>ypos</key>
-			<real>235.0</real>
+			<real>235</real>
 		</dict>
 		<key>6D7E8F9A-0B1C-2D3E-4F5A-6B7C8D9E0F1A</key>
 		<dict>
 			<key>xpos</key>
-			<real>175.0</real>
+			<real>175</real>
 			<key>ypos</key>
-			<real>570.0</real>
+			<real>570</real>
 		</dict>
 		<key>7E8F9A0B-1C2D-3E4F-5A6B-7C8D9E0F1A2B</key>
 		<dict>
 			<key>xpos</key>
-			<real>695.0</real>
+			<real>695</real>
 			<key>ypos</key>
-			<real>570.0</real>
+			<real>570</real>
 		</dict>
 		<key>868D5B1C-8143-4515-9097-A8D66D39AC8C</key>
 		<dict>
 			<key>colorindex</key>
 			<integer>1</integer>
 			<key>xpos</key>
-			<real>695.0</real>
+			<real>695</real>
 			<key>ypos</key>
-			<real>840.0</real>
+			<real>840</real>
 		</dict>
 		<key>8F9A0B1C-2D3E-4F5A-6B7C-8D9E0F1A2B3C</key>
 		<dict>
 			<key>xpos</key>
-			<real>175.0</real>
+			<real>175</real>
 			<key>ypos</key>
-			<real>695.0</real>
+			<real>695</real>
 		</dict>
 		<key>9A0B1C2D-3E4F-5A6B-7C8D-9E0F1A2B3C4D</key>
 		<dict>
 			<key>xpos</key>
-			<real>695.0</real>
+			<real>695</real>
 			<key>ypos</key>
-			<real>695.0</real>
+			<real>695</real>
 		</dict>
 		<key>B8DFA926-D68D-464E-A5C6-92E02A01CA06</key>
 		<dict>
 			<key>xpos</key>
-			<real>30.0</real>
+			<real>30</real>
 			<key>ypos</key>
-			<real>450.0</real>
+			<real>450</real>
 		</dict>
 		<key>BDEB04F8-B091-4FCC-8AF1-633D024E8D1C</key>
 		<dict>
 			<key>xpos</key>
-			<real>960.0</real>
+			<real>960</real>
 			<key>ypos</key>
-			<real>125.0</real>
+			<real>125</real>
 		</dict>
 		<key>C2CD2917-AC9F-4FD5-ABED-3679819045D3</key>
 		<dict>
 			<key>colorindex</key>
 			<integer>1</integer>
 			<key>xpos</key>
-			<real>215.0</real>
+			<real>215</real>
 			<key>ypos</key>
-			<real>870.0</real>
+			<real>870</real>
 		</dict>
 		<key>CEAADCD1-F574-48F0-9B9D-A0DD48203B19</key>
 		<dict>
 			<key>xpos</key>
-			<real>600.0</real>
+			<real>600</real>
 			<key>ypos</key>
-			<real>345.0</real>
+			<real>345</real>
 		</dict>
 		<key>CF72B865-679D-4D89-899B-DB47159476C3</key>
 		<dict>
 			<key>colorindex</key>
 			<integer>1</integer>
 			<key>xpos</key>
-			<real>400.0</real>
+			<real>400</real>
 			<key>ypos</key>
-			<real>840.0</real>
+			<real>840</real>
 		</dict>
 		<key>COPY-SCRIPT</key>
 		<dict>
 			<key>xpos</key>
-			<real>780.0</real>
+			<real>780</real>
 			<key>ypos</key>
-			<real>125.0</real>
+			<real>125</real>
 		</dict>
 		<key>HIDE-COPY</key>
 		<dict>
 			<key>xpos</key>
-			<real>600.0</real>
+			<real>600</real>
 			<key>ypos</key>
-			<real>125.0</real>
+			<real>125</real>
 		</dict>
 		<key>HIDE-DETAILS</key>
 		<dict>
 			<key>xpos</key>
-			<real>780.0</real>
+			<real>780</real>
 			<key>ypos</key>
-			<real>345.0</real>
+			<real>345</real>
 		</dict>
 		<key>HIDE-URL</key>
 		<dict>
 			<key>xpos</key>
-			<real>600.0</real>
+			<real>600</real>
 			<key>ypos</key>
-			<real>235.0</real>
+			<real>235</real>
 		</dict>
 		<key>RECENT-COND</key>
 		<dict>
 			<key>xpos</key>
-			<real>400.0</real>
+			<real>400</real>
 			<key>ypos</key>
-			<real>1000.0</real>
+			<real>1000</real>
 		</dict>
 		<key>RECENT-HOTKEY</key>
 		<dict>
 			<key>xpos</key>
-			<real>30.0</real>
+			<real>30</real>
 			<key>ypos</key>
-			<real>1000.0</real>
+			<real>1000</real>
 		</dict>
 		<key>RECENT-NOTIFY</key>
 		<dict>
 			<key>xpos</key>
-			<real>600.0</real>
+			<real>600</real>
 			<key>ypos</key>
-			<real>1100.0</real>
+			<real>1100</real>
 		</dict>
 		<key>RECENT-SCRIPT</key>
 		<dict>
 			<key>xpos</key>
-			<real>175.0</real>
+			<real>175</real>
 			<key>ypos</key>
-			<real>1000.0</real>
+			<real>1000</real>
 		</dict>
 		<key>RECORD-SCRIPT</key>
 		<dict>
 			<key>xpos</key>
-			<real>780.0</real>
+			<real>780</real>
 			<key>ypos</key>
-			<real>235.0</real>
+			<real>235</real>
 		</dict>
 		<key>SHOW-DETAILS-TRIGGER</key>
 		<dict>
 			<key>note</key>
 			<string>Reopens the details after the unlock prompt closed them</string>
 			<key>xpos</key>
-			<real>400.0</real>
+			<real>400</real>
 			<key>ypos</key>
-			<real>450.0</real>
+			<real>450</real>
 		</dict>
 		<key>SYNC-SCRIPT</key>
 		<dict>
 			<key>xpos</key>
-			<real>600.0</real>
+			<real>600</real>
 			<key>ypos</key>
-			<real>15.0</real>
+			<real>15</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
@@ -1714,7 +1714,7 @@
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>0.2-alpha1</string>
+	<string>0.1.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/rwilgaard/alfred-1password-search</string>
 </dict>

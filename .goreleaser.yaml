@@ -1,21 +1,29 @@
 version: 2
 project_name: alfred-1password-search
+
 builds:
-  - id: amd64
-    main: ./src
-    binary: alfred-1password-search-amd64
-    goos: [darwin]
-    goarch: [amd64]
-    env: [CGO_ENABLED=0]
-  - id: arm64
-    main: ./src
-    binary: alfred-1password-search-arm64
-    goos: [darwin]
-    goarch: [arm64]
-    env: [CGO_ENABLED=0]
-archives:
-  - format: zip
-    files:
-      - workflow/**
+  - skip: true
+
 release:
+  extra_files:
+    - glob: ./alfred-1password-search.alfredworkflow
   draft: true
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+      - '^docs:'
+  groups:
+    - title: New Features
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: Bug fixes
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 10
+    - title: Other work
+      order: 999
