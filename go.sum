@@ -12,6 +12,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/rwilgaard/go-alfredutils/v2 v2.5.1 h1:R92HZc1eBgbVxCbtgyeF+vkyzVTaKgj1mVJ+iebD9RI=
 github.com/rwilgaard/go-alfredutils/v2 v2.5.1/go.mod h1:xNtZ5IQYcoP+OZmFIvBZBhDH/JKHmufBxoS1pDDRQBY=
+github.com/rwilgaard/go-alfredutils/v2 v2.6.0 h1:kfR98uUyfeEE6mwN7AhPdpXmffGBdHGSPATVKVEjpvA=
+github.com/rwilgaard/go-alfredutils/v2 v2.6.0/go.mod h1:xNtZ5IQYcoP+OZmFIvBZBhDH/JKHmufBxoS1pDDRQBY=
 github.com/sethvargo/go-password v0.4.0 h1:eSidVKQw5C7CmTDAtH3RipBTSjdU1ZRxQaynD2GWLVU=
 github.com/sethvargo/go-password v0.4.0/go.mod h1:PO3nYHwUpcHPR0F9woy7a4abZPvzRuqJr0GaeIYTm3k=
 github.com/spf13/cobra v1.10.2 h1:DMTTonx5m65Ic0GOoRY2c16WCbHxOOw6xxezuLaBpcU=
